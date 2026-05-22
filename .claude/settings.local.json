@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go vet *)",
+      "Bash(go build *)",
+      "Bash(./envx --help)",
+      "Bash(npm --version)",
+      "Bash(npx shadcn@latest init --yes --defaults)",
+      "Bash(npm run *)",
+      "Bash(go get *)",
+      "Bash(npm install *)",
+      "Bash(mkdir -p /Users/muhammadmuntasir/.dotkey)",
+      "Bash(cp /Users/muhammadmuntasir/.envx/config.yaml /Users/muhammadmuntasir/.dotkey/config.yaml)",
+      "Bash(go mod *)",
+      "Bash(./dotkey --help)"
+    ]
+  }
+}

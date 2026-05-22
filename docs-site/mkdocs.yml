@@ -1,0 +1,82 @@
+site_name: dotkey
+site_description: Open-source environment variable management for teams
+site_url: https://muhmunt.github.io/dotkey
+repo_url: https://github.com/muhmunt/dotkey
+repo_name: muhmunt/dotkey
+edit_uri: edit/main/docs-site/docs/
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: custom
+    accent: custom
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/muhmunt/dotkey
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Overview: getting-started/index.md
+      - Quick Start (Docker): getting-started/quick-start.md
+      - Manual Installation: getting-started/manual-install.md
+  - Self-Hosting:
+      - Docker Compose: self-hosting/docker.md
+      - Environment Variables: self-hosting/env-vars.md
+  - Dashboard:
+      - Projects: dashboard/projects.md
+      - Environments: dashboard/environments.md
+      - Variables: dashboard/variables.md
+      - 2FA & Reveal Lock: dashboard/2fa.md
+      - API Tokens: dashboard/tokens.md
+      - Team Management: dashboard/team.md
+      - Keyboard Shortcuts: dashboard/shortcuts.md
+  - CLI:
+      - Installation: cli/installation.md
+      - Authentication: cli/authentication.md
+      - Commands: cli/commands.md
+  - API Reference:
+      - Authentication: api/authentication.md
+      - Projects: api/projects.md
+      - Variables: api/variables.md
+  - Integrations:
+      - GitHub Actions: integrations/github-actions.md
+      - Docker Compose: integrations/docker.md
+  - Contributing:
+      - How to Contribute: contributing/index.md
+      - Architecture: contributing/architecture.md
+  - Security: security.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - tables
+  - toc:
+      permalink: true

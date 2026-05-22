@@ -1,0 +1,43 @@
+# Secrets & local config
+.env
+.env.local
+*.db
+
+# Build artifacts
+dotkey-server
+envx-server
+
+# CLI is tracked in its own repo
+/cli/
+
+# Node / Next.js
+web/node_modules/
+web/.next/
+web/out/
+
+# MkDocs build output
+docs-site/site/
+
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Internal planning docs
+ALL_FEATURES_PLAN.md
+BACKEND_DASHBOARD_PLAN.md
+CLI_PLAN.md
+DASHBOARD_PLAN.md
+DESIGN_PLAN.md
+DOCS_PLAN.md
+NEXT_IDEAS.md
+RECAP.md

@@ -9,7 +9,27 @@
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
+         <loc>https://muhmunt.github.io/dotkey/api/authentication/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/api/projects/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/api/variables/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/cli/authentication/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
          <loc>https://muhmunt.github.io/dotkey/cli/commands/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/cli/installation/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
@@ -21,11 +41,51 @@
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
+         <loc>https://muhmunt.github.io/dotkey/dashboard/2fa/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/dashboard/environments/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/dashboard/projects/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/dashboard/shortcuts/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/dashboard/team/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/dashboard/tokens/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/dashboard/variables/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
          <loc>https://muhmunt.github.io/dotkey/getting-started/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>
+         <loc>https://muhmunt.github.io/dotkey/getting-started/manual-install/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
          <loc>https://muhmunt.github.io/dotkey/getting-started/quick-start/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/integrations/docker/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/integrations/github-actions/</loc>
          <lastmod>2026-05-22</lastmod>
     </url>
     <url>

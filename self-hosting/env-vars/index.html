@@ -10,29 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://muhmunt.github.io/dotkey/">
+        <link rel="canonical" href="https://muhmunt.github.io/dotkey/self-hosting/env-vars/">
       
       
+        <link rel="prev" href="../docker/">
       
-        <link rel="next" href="getting-started/">
+      
+        <link rel="next" href="../../cli/commands/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>dotkey</title>
+        <title>Environment Variables - dotkey</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -51,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dotkey" class="md-skip">
+        <a href="#environment-variables" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="dotkey" class="md-header__button md-logo" aria-label="dotkey" data-md-component="logo">
+    <a href="../.." title="dotkey" class="md-header__button md-logo" aria-label="dotkey" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Environment Variables
             
           </span>
         </div>
@@ -195,11 +197,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -220,7 +220,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="getting-started/" class="md-tabs__link">
+        <a href="../../getting-started/" class="md-tabs__link">
           
   
   
@@ -236,11 +236,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="self-hosting/docker/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../docker/" class="md-tabs__link">
           
   
   
@@ -260,7 +262,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="dashboard/projects.md" class="md-tabs__link">
+        <a href="../../dashboard/projects.md" class="md-tabs__link">
           
   
   
@@ -280,7 +282,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="cli/installation.md" class="md-tabs__link">
+        <a href="../../cli/installation.md" class="md-tabs__link">
           
   
   
@@ -300,7 +302,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="api/authentication.md" class="md-tabs__link">
+        <a href="../../api/authentication.md" class="md-tabs__link">
           
   
   
@@ -320,7 +322,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="integrations/github-actions.md" class="md-tabs__link">
+        <a href="../../integrations/github-actions.md" class="md-tabs__link">
           
   
   
@@ -340,7 +342,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="contributing/" class="md-tabs__link">
+        <a href="../../contributing/" class="md-tabs__link">
           
   
   
@@ -358,7 +360,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="security/" class="md-tabs__link">
+      <a href="../../security/" class="md-tabs__link">
         
   
   
@@ -393,7 +395,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="dotkey" class="md-nav__button md-logo" aria-label="dotkey" data-md-component="logo">
+    <a href="../.." title="dotkey" class="md-nav__button md-logo" aria-label="dotkey" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -420,37 +422,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -466,48 +441,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Features
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick start
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -573,7 +506,7 @@
   
   
     <li class="md-nav__item">
-      <a href="getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -601,7 +534,7 @@
   
   
     <li class="md-nav__item">
-      <a href="getting-started/quick-start/" class="md-nav__link">
+      <a href="../../getting-started/quick-start/" class="md-nav__link">
         
   
   
@@ -629,7 +562,7 @@
   
   
     <li class="md-nav__item">
-      <a href="getting-started/manual-install.md" class="md-nav__link">
+      <a href="../../getting-started/manual-install.md" class="md-nav__link">
         
   
   
@@ -661,28 +594,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -700,7 +636,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -718,7 +654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="self-hosting/docker/" class="md-nav__link">
+      <a href="../docker/" class="md-nav__link">
         
   
   
@@ -743,10 +679,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="self-hosting/env-vars/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -762,6 +725,48 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -835,7 +840,7 @@
   
   
     <li class="md-nav__item">
-      <a href="dashboard/projects.md" class="md-nav__link">
+      <a href="../../dashboard/projects.md" class="md-nav__link">
         
   
   
@@ -863,7 +868,7 @@
   
   
     <li class="md-nav__item">
-      <a href="dashboard/environments.md" class="md-nav__link">
+      <a href="../../dashboard/environments.md" class="md-nav__link">
         
   
   
@@ -891,7 +896,7 @@
   
   
     <li class="md-nav__item">
-      <a href="dashboard/variables.md" class="md-nav__link">
+      <a href="../../dashboard/variables.md" class="md-nav__link">
         
   
   
@@ -919,7 +924,7 @@
   
   
     <li class="md-nav__item">
-      <a href="dashboard/2fa.md" class="md-nav__link">
+      <a href="../../dashboard/2fa.md" class="md-nav__link">
         
   
   
@@ -947,7 +952,7 @@
   
   
     <li class="md-nav__item">
-      <a href="dashboard/tokens.md" class="md-nav__link">
+      <a href="../../dashboard/tokens.md" class="md-nav__link">
         
   
   
@@ -975,7 +980,7 @@
   
   
     <li class="md-nav__item">
-      <a href="dashboard/team.md" class="md-nav__link">
+      <a href="../../dashboard/team.md" class="md-nav__link">
         
   
   
@@ -1003,7 +1008,7 @@
   
   
     <li class="md-nav__item">
-      <a href="dashboard/shortcuts.md" class="md-nav__link">
+      <a href="../../dashboard/shortcuts.md" class="md-nav__link">
         
   
   
@@ -1092,7 +1097,7 @@
   
   
     <li class="md-nav__item">
-      <a href="cli/installation.md" class="md-nav__link">
+      <a href="../../cli/installation.md" class="md-nav__link">
         
   
   
@@ -1120,7 +1125,7 @@
   
   
     <li class="md-nav__item">
-      <a href="cli/authentication.md" class="md-nav__link">
+      <a href="../../cli/authentication.md" class="md-nav__link">
         
   
   
@@ -1148,7 +1153,7 @@
   
   
     <li class="md-nav__item">
-      <a href="cli/commands/" class="md-nav__link">
+      <a href="../../cli/commands/" class="md-nav__link">
         
   
   
@@ -1237,7 +1242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/authentication.md" class="md-nav__link">
+      <a href="../../api/authentication.md" class="md-nav__link">
         
   
   
@@ -1265,7 +1270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/projects.md" class="md-nav__link">
+      <a href="../../api/projects.md" class="md-nav__link">
         
   
   
@@ -1293,7 +1298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/variables.md" class="md-nav__link">
+      <a href="../../api/variables.md" class="md-nav__link">
         
   
   
@@ -1382,7 +1387,7 @@
   
   
     <li class="md-nav__item">
-      <a href="integrations/github-actions.md" class="md-nav__link">
+      <a href="../../integrations/github-actions.md" class="md-nav__link">
         
   
   
@@ -1410,7 +1415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="integrations/docker.md" class="md-nav__link">
+      <a href="../../integrations/docker.md" class="md-nav__link">
         
   
   
@@ -1499,7 +1504,7 @@
   
   
     <li class="md-nav__item">
-      <a href="contributing/" class="md-nav__link">
+      <a href="../../contributing/" class="md-nav__link">
         
   
   
@@ -1527,7 +1532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="contributing/architecture/" class="md-nav__link">
+      <a href="../../contributing/architecture/" class="md-nav__link">
         
   
   
@@ -1562,7 +1567,7 @@
   
   
     <li class="md-nav__item">
-      <a href="security/" class="md-nav__link">
+      <a href="../../security/" class="md-nav__link">
         
   
   
@@ -1609,10 +1614,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
+  <a href="#required" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Features
+        Required
       
     </span>
   </a>
@@ -1620,10 +1625,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
+  <a href="#optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick start
+        Optional
       
     </span>
   </a>
@@ -1650,31 +1655,72 @@
   
 
 
-<h1 id="dotkey">dotkey<a class="headerlink" href="#dotkey" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p>Stop sharing <code>.env</code> files over Slack.</p>
-</blockquote>
-<p><strong>dotkey</strong> is an open-source, self-hosted environment variable manager for developers and teams.</p>
-<h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>AES-256-GCM</strong> encryption for all secrets at rest</li>
-<li><strong>Team roles</strong> — owner · admin · developer · read-only</li>
-<li><strong>CLI</strong> — <code>dotkey pull</code> / <code>push</code> / <code>diff</code> / <code>rollback</code></li>
-<li><strong>2FA</strong> — Google Authenticator, Authy, 1Password</li>
-<li><strong>Reveal lock</strong> — 2FA required to view secret values</li>
-<li><strong>CI/CD tokens</strong> — non-expiring, project-scoped</li>
-<li><strong>Version history</strong> with one-click rollback</li>
-<li><strong>Environment lock</strong> — prevent accidental production edits</li>
-</ul>
-<h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/muhmunt/dotkey
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>dotkey
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
-</code></pre></div>
-<p>Open <strong>http://localhost:3000</strong> → register → start managing secrets.</p>
-<p><a class="md-button md-button--primary" href="getting-started/">Get started →</a>
-<a class="md-button" href="self-hosting/docker/">Self-hosting guide →</a></p>
+<h1 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h1>
+<p>All variables are set in the <code>.env</code> file at the repo root.</p>
+<h2 id="required">Required<a class="headerlink" href="#required" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DATABASE_URL</code></td>
+<td>PostgreSQL connection string</td>
+<td><code>postgres://user:pass@host:5432/dotkey?sslmode=disable</code></td>
+</tr>
+<tr>
+<td><code>JWT_SECRET</code></td>
+<td>Secret for signing JWTs — 32+ random chars</td>
+<td><code>openssl rand -hex 32</code></td>
+</tr>
+<tr>
+<td><code>ENCRYPTION_KEY</code></td>
+<td>AES-256 key — must be exactly 32 characters</td>
+<td><code>openssl rand -hex 16</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="optional">Optional<a class="headerlink" href="#optional" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PORT</code></td>
+<td><code>8080</code></td>
+<td>API server port</td>
+</tr>
+<tr>
+<td><code>ALLOWED_ORIGINS</code></td>
+<td><code>http://localhost:3000</code></td>
+<td>Comma-separated CORS allowed origins</td>
+</tr>
+<tr>
+<td><code>DB_PASSWORD</code></td>
+<td><code>dotkey</code></td>
+<td>Postgres password (Docker Compose only)</td>
+</tr>
+<tr>
+<td><code>API_URL</code></td>
+<td><code>http://localhost:8080</code></td>
+<td>API URL shown to the dashboard container</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Secret rotation</p>
+<p>Changing <code>ENCRYPTION_KEY</code> will make all existing secrets unreadable.
+Changing <code>JWT_SECRET</code> will invalidate all active sessions.</p>
+</div>
 
 
 
@@ -1748,10 +1794,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

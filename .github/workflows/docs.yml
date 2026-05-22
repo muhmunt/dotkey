@@ -23,7 +23,8 @@ jobs:
         with:
           python-version: 3.x
           cache: pip
+          cache-dependency-path: docs-site/requirements.txt
 
-      - run: pip install mkdocs-material
+      - run: pip install -r docs-site/requirements.txt
 
       - run: cd docs-site && mkdocs gh-deploy --force

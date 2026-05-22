@@ -260,6 +260,40 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
+
+        {/* Keyboard shortcuts */}
+        <div className="border border-border rounded-lg overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-border bg-card/50 flex items-center justify-between">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Keyboard Shortcuts</p>
+            <kbd className="text-xs font-mono border border-border rounded px-1.5 py-0.5 text-muted-foreground">?</kbd>
+          </div>
+          <div className="px-4 py-3">
+            <div className="space-y-2 text-xs">
+              {[
+                { keys: "⌘ K", desc: "Open global search" },
+                { keys: "?", desc: "Open this shortcuts panel" },
+                { keys: "Esc", desc: "Close any overlay" },
+                { keys: "↑ ↓ + Enter", desc: "Navigate search results" },
+              ].map(({ keys, desc }) => (
+                <div key={desc} className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{desc}</span>
+                  <kbd className="font-mono text-xs border border-border rounded px-1.5 py-0.5 text-foreground bg-input">
+                    {keys}
+                  </kbd>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                const e = new KeyboardEvent("keydown", { key: "?", bubbles: true })
+                document.dispatchEvent(e)
+              }}
+              className="mt-3 text-xs text-primary hover:text-primary/80 transition-colors"
+            >
+              View all shortcuts →
+            </button>
+          </div>
+        </div>
       </div>
     </AppShell>
   )

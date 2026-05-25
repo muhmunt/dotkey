@@ -10,13 +10,47 @@ type ProjectAccess interface {
 	GetMemberRole(projectID, userID string) (string, error)
 }
 
+// VariableCopier is satisfied by variable.Service.
+type VariableCopier interface {
+	CopyToEnvironment(projectID, srcEnvID, dstEnvID, actorID string) (int, error)
+}
+
 type Service struct {
 	repo    *Repository
 	projSvc ProjectAccess
+	varSvc  VariableCopier
 }
 
 func NewService(repo *Repository, projSvc ProjectAccess) *Service {
 	return &Service{repo: repo, projSvc: projSvc}
+}
+
+func (s *Service) SetVariableCopier(vc VariableCopier) { s.varSvc = vc }
+
+// Clone copies all variables from srcEnvID into dstEnvID — developer+ role required on both.
+func (s *Service) Clone(projectID, srcEnvID, dstEnvID, userID string) (int, error) {
+	role, err := s.projSvc.GetMemberRole(projectID, userID)
+	if err != nil {
+		return 0, errors.New("project not found")
+	}
+	if role == "readonly" {
+		return 0, errors.New("insufficient permissions")
+	}
+	src, err := s.repo.FindByID(srcEnvID)
+	if err != nil || src.ProjectID != projectID {
+		return 0, errors.New("source environment not found")
+	}
+	dst, err := s.repo.FindByID(dstEnvID)
+	if err != nil || dst.ProjectID != projectID {
+		return 0, errors.New("target environment not found")
+	}
+	if dst.Locked {
+		return 0, errors.New("target environment is locked")
+	}
+	if s.varSvc == nil {
+		return 0, errors.New("clone not available")
+	}
+	return s.varSvc.CopyToEnvironment(projectID, srcEnvID, dstEnvID, userID)
 }
 
 func (s *Service) List(projectID, userID string) ([]models.Environment, error) {

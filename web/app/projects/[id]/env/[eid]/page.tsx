@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { formatDate, formatSeconds } from "@/lib/utils"
 import { useReveal } from "@/context/reveal-context"
 import { RevealLockModal } from "@/components/reveal-lock-modal"
-import { Eye, EyeOff, Copy, Pencil, Trash2, Plus, Upload, Download, Check, X, Lock, Unlock, Timer } from "lucide-react"
+import { Eye, EyeOff, Copy, Pencil, Trash2, Plus, Upload, Download, Check, X, Lock, Unlock, Timer, Square, CheckSquare } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import type { Variable } from "@/lib/api"
@@ -38,6 +38,8 @@ export default function EnvPage() {
   const [showAdd, setShowAdd] = useState(false)
   const [newKey, setNewKey] = useState("")
   const [newValue, setNewValue] = useState("")
+  const [keyError, setKeyError] = useState("")
+  const [selected, setSelected] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState("")
   const [showRevealModal, setShowRevealModal] = useState(false)
   const [pendingRevealAction, setPendingRevealAction] = useState<(() => void) | null>(null)
@@ -92,12 +94,32 @@ export default function EnvPage() {
     })
   }
 
+  function validateKey(key: string): string {
+    if (!key.trim()) return "Key is required"
+    if (/\s/.test(key)) return "Key cannot contain spaces"
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key.trim())) return "Must start with a letter or underscore, letters/numbers/underscores only"
+    if (vars.some(v => v.key === key.trim())) return `"${key.trim()}" already exists in this environment`
+    return ""
+  }
+
   const createVar = useMutation({
     mutationFn: () => variables.create(projectId, envId, newKey.trim(), newValue),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["variables", projectId, envId] })
-      setNewKey(""); setNewValue(""); setShowAdd(false)
+      setNewKey(""); setNewValue(""); setShowAdd(false); setKeyError("")
       toast.success("Variable added")
+    },
+    onError: (err: any) => toast.error(err.message),
+  })
+
+  const bulkDelete = useMutation({
+    mutationFn: async (ids: string[]) => {
+      for (const id of ids) await variables.delete(projectId, envId, id)
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["variables", projectId, envId] })
+      setSelected(new Set()); setRevealed({})
+      toast.success("Deleted selected variables")
     },
     onError: (err: any) => toast.error(err.message),
   })
@@ -227,18 +249,29 @@ export default function EnvPage() {
 
       {/* add row */}
       {showAdd && (
-        <form onSubmit={e => { e.preventDefault(); createVar.mutate() }}
-          className="flex items-center gap-2 mb-3 p-2.5 border border-primary/30 rounded-md bg-card">
-          <Input value={newKey} onChange={e => setNewKey(e.target.value)}
-            placeholder="KEY" className="h-7 text-xs font-mono w-48 bg-input border-border" autoFocus />
-          <Input value={newValue} onChange={e => setNewValue(e.target.value)}
-            placeholder="value" className="h-7 text-xs font-mono flex-1 bg-input border-border" />
-          <Button type="submit" size="sm" className="h-7 text-xs" disabled={!newKey.trim() || createVar.isPending}>
-            {createVar.isPending ? "Saving…" : "Save"}
-          </Button>
-          <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowAdd(false)}>
-            <X className="h-3.5 w-3.5" />
-          </Button>
+        <form onSubmit={e => {
+          e.preventDefault()
+          const err = validateKey(newKey)
+          if (err) { setKeyError(err); return }
+          setKeyError("")
+          createVar.mutate()
+        }} className="mb-3 p-2.5 border border-primary/30 rounded-md bg-card space-y-1.5">
+          <div className="flex items-center gap-2">
+            <div className="w-48 space-y-1">
+              <Input value={newKey}
+                onChange={e => { setNewKey(e.target.value); keyError && setKeyError("") }}
+                placeholder="VARIABLE_KEY" className={cn("h-7 text-xs font-mono bg-input border-border", keyError && "border-destructive")} autoFocus />
+            </div>
+            <Input value={newValue} onChange={e => setNewValue(e.target.value)}
+              placeholder="value" className="h-7 text-xs font-mono flex-1 bg-input border-border" />
+            <Button type="submit" size="sm" className="h-7 text-xs" disabled={createVar.isPending}>
+              {createVar.isPending ? "Saving…" : "Save"}
+            </Button>
+            <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setShowAdd(false); setKeyError("") }}>
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+          {keyError && <p className="text-xs text-destructive pl-0.5">{keyError}</p>}
         </form>
       )}
 
@@ -255,6 +288,21 @@ export default function EnvPage() {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-border bg-card/50">
+                {!isLocked && (
+                  <th className="px-3 py-2 w-8">
+                    <button
+                      onClick={() => {
+                        if (selected.size === filtered.length) setSelected(new Set())
+                        else setSelected(new Set(filtered.map(v => v.id)))
+                      }}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {selected.size === filtered.length && filtered.length > 0
+                        ? <CheckSquare className="h-3.5 w-3.5" />
+                        : <Square className="h-3.5 w-3.5" />}
+                    </button>
+                  </th>
+                )}
                 <th className="text-left px-3 py-2 text-muted-foreground font-medium w-1/3">KEY</th>
                 <th className="text-left px-3 py-2 text-muted-foreground font-medium">VALUE</th>
                 <th className="text-right px-3 py-2 text-muted-foreground font-medium w-32 hidden sm:table-cell">UPDATED</th>
@@ -263,7 +311,21 @@ export default function EnvPage() {
             </thead>
             <tbody>
               {filtered.map((v, i) => (
-                <tr key={v.id} className={cn(i > 0 && "border-t border-border", "hover:bg-accent/30 transition-colors")}>
+                <tr key={v.id} className={cn(i > 0 && "border-t border-border", "hover:bg-accent/30 transition-colors", selected.has(v.id) && "bg-primary/5")}>
+                  {!isLocked && (
+                    <td className="px-3 py-2.5">
+                      <button
+                        onClick={() => setSelected(prev => {
+                          const next = new Set(prev)
+                          next.has(v.id) ? next.delete(v.id) : next.add(v.id)
+                          return next
+                        })}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {selected.has(v.id) ? <CheckSquare className="h-3.5 w-3.5 text-primary" /> : <Square className="h-3.5 w-3.5" />}
+                      </button>
+                    </td>
+                  )}
                   <td className="px-3 py-2.5 font-mono font-medium">{v.key}</td>
 
                   <td className="px-3 py-2.5 font-mono">
@@ -321,6 +383,30 @@ export default function EnvPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      {/* bulk action bar */}
+      {selected.size > 0 && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2.5 rounded-lg border border-border bg-card shadow-xl shadow-black/30 z-50">
+          <span className="text-xs text-muted-foreground">{selected.size} selected</span>
+          <div className="w-px h-4 bg-border" />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+            disabled={bulkDelete.isPending}
+            onClick={() => {
+              if (confirm(`Delete ${selected.size} variable${selected.size > 1 ? "s" : ""}?`)) {
+                bulkDelete.mutate([...selected])
+              }
+            }}
+          >
+            <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+            {bulkDelete.isPending ? "Deleting…" : "Delete selected"}
+          </Button>
+          <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setSelected(new Set())}>
+            <X className="h-3.5 w-3.5 mr-1" /> Clear
+          </Button>
         </div>
       )}
     </div>

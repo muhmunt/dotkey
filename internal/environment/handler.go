@@ -78,3 +78,19 @@ func (h *Handler) Delete(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "environment deleted"})
 }
+
+func (h *Handler) Clone(c *gin.Context) {
+	var input struct {
+		TargetEnvID string `json:"target_env_id" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "target_env_id is required"})
+		return
+	}
+	n, err := h.svc.Clone(c.Param("id"), c.Param("eid"), input.TargetEnvID, c.GetString("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"synced": n})
+}

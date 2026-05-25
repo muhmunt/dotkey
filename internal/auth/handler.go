@@ -98,6 +98,38 @@ func (h *Handler) Me(c *gin.Context) {
 	c.JSON(http.StatusOK, CurrentUser(c))
 }
 
+func (h *Handler) UpdateMe(c *gin.Context) {
+	var input struct {
+		Name string `json:"name" binding:"required,min=1"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "name is required"})
+		return
+	}
+	user, err := h.svc.UpdateName(CurrentUser(c).ID, input.Name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) ChangePassword(c *gin.Context) {
+	var input struct {
+		CurrentPassword string `json:"current_password" binding:"required"`
+		NewPassword     string `json:"new_password" binding:"required,min=8"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := h.svc.ChangePassword(CurrentUser(c).ID, input.CurrentPassword, input.NewPassword); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "password updated"})
+}
+
 func (h *Handler) Logout(c *gin.Context) {
 	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 	h.svc.Revoke(token) //nolint:errcheck — best-effort revocation

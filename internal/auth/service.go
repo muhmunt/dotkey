@@ -62,6 +62,35 @@ type LoginResult struct {
 	StateToken  string // short-lived token to carry through the 2FA step
 }
 
+// ── Account management ────────────────────────────────────────────────────────
+
+func (s *Service) UpdateName(userID, name string) (*models.User, error) {
+	var user models.User
+	if err := db.DB.First(&user, "id = ?", userID).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+	user.Name = name
+	if err := db.DB.Save(&user).Error; err != nil {
+		return nil, errors.New("failed to update name")
+	}
+	return &user, nil
+}
+
+func (s *Service) ChangePassword(userID, currentPassword, newPassword string) error {
+	var user models.User
+	if err := db.DB.First(&user, "id = ?", userID).Error; err != nil {
+		return errors.New("user not found")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(currentPassword)); err != nil {
+		return errors.New("current password is incorrect")
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	return db.DB.Model(&user).Update("password_hash", string(hash)).Error
+}
+
 // ── Register / Login ──────────────────────────────────────────────────────────
 
 func (s *Service) Register(name, email, password string) (*models.User, error) {

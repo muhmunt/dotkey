@@ -42,6 +42,12 @@ export const auth = {
     req<{ token: string; user: User }>("/api/v1/auth/register", {
       method: "POST", body: JSON.stringify({ name, email, password }),
     }),
+  updateMe: (name: string) =>
+    req<User>("/api/v1/auth/me", { method: "PUT", body: JSON.stringify({ name }) }),
+  changePassword: (current_password: string, new_password: string) =>
+    req<{ message: string }>("/api/v1/auth/change-password", {
+      method: "POST", body: JSON.stringify({ current_password, new_password }),
+    }),
   login: (email: string, password: string) =>
     req<{ token: string }>("/api/v1/auth/login", {
       method: "POST", body: JSON.stringify({ email, password }),
@@ -187,6 +193,10 @@ export const environments = {
     }),
   delete: (projectId: string, envId: string) =>
     req<void>(`/api/v1/projects/${projectId}/environments/${envId}`, { method: "DELETE" }),
+  clone: (projectId: string, srcEnvId: string, targetEnvId: string) =>
+    req<{ synced: number }>(`/api/v1/projects/${projectId}/environments/${srcEnvId}/clone`, {
+      method: "POST", body: JSON.stringify({ target_env_id: targetEnvId }),
+    }),
 }
 
 // ── Variables ─────────────────────────────────────────────────────────────────

@@ -7,14 +7,28 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { formatDate } from "@/lib/utils"
-import { Shield, ShieldOff, ShieldCheck, Smartphone } from "lucide-react"
+import { Shield, ShieldOff, ShieldCheck, Smartphone, Pencil, Check, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 import QRCode from "react-qr-code"
 
 export default function SettingsPage() {
   const qc = useQueryClient()
   const { data: user, refetch } = useQuery({ queryKey: ["me"], queryFn: auth.me })
+
+  // name edit
+  const [editingName, setEditingName] = useState(false)
+  const [nameValue, setNameValue] = useState("")
+  const [nameSaving, setNameSaving] = useState(false)
+
+  // change password
+  const [showPassword, setShowPassword] = useState(false)
+  const [currentPw, setCurrentPw] = useState("")
+  const [newPw, setNewPw] = useState("")
+  const [confirmPw, setConfirmPw] = useState("")
+  const [pwErrors, setPwErrors] = useState<Record<string, string>>({})
+  const [pwSaving, setPwSaving] = useState(false)
 
   // 2FA setup state
   const [qrURL, setQrURL] = useState("")
@@ -23,6 +37,42 @@ export default function SettingsPage() {
   const [disableCode, setDisableCode] = useState("")
   const [showDisable, setShowDisable] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  async function saveName() {
+    if (!nameValue.trim()) return
+    setNameSaving(true)
+    try {
+      await auth.updateMe(nameValue.trim())
+      refetch(); qc.invalidateQueries({ queryKey: ["me"] })
+      setEditingName(false)
+      toast.success("Name updated")
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setNameSaving(false)
+    }
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault()
+    const errs: Record<string, string> = {}
+    if (!currentPw) errs.current = "Current password is required"
+    if (newPw.length < 8) errs.new = "New password must be at least 8 characters"
+    if (!confirmPw) errs.confirm = "Please confirm your new password"
+    else if (newPw !== confirmPw) errs.confirm = "Passwords do not match"
+    if (Object.keys(errs).length) { setPwErrors(errs); return }
+    setPwErrors({})
+    setPwSaving(true)
+    try {
+      await auth.changePassword(currentPw, newPw)
+      setShowPassword(false); setCurrentPw(""); setNewPw(""); setConfirmPw("")
+      toast.success("Password updated")
+    } catch (err: any) {
+      setPwErrors({ current: err.message })
+    } finally {
+      setPwSaving(false)
+    }
+  }
 
   async function startSetup() {
     setLoading(true)
@@ -84,8 +134,38 @@ export default function SettingsPage() {
           <div className="px-4 py-2.5 border-b border-border bg-card/50">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Account</p>
           </div>
+          {/* name row — editable */}
+          <div className="flex items-center px-4 py-3 border-b border-border">
+            <span className="text-xs text-muted-foreground w-28">Name</span>
+            {editingName ? (
+              <div className="flex items-center gap-1.5 flex-1">
+                <Input
+                  value={nameValue}
+                  onChange={e => setNameValue(e.target.value)}
+                  className="h-7 text-xs bg-input border-border"
+                  autoFocus
+                  onKeyDown={e => { if (e.key === "Enter") saveName(); if (e.key === "Escape") setEditingName(false) }}
+                />
+                <button onClick={saveName} disabled={nameSaving} className="text-primary hover:text-primary/80 transition-colors">
+                  <Check className="h-3.5 w-3.5" />
+                </button>
+                <button onClick={() => setEditingName(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 group flex-1">
+                <span className="text-xs font-mono">{user?.name ?? "—"}</span>
+                <button
+                  onClick={() => { setNameValue(user?.name ?? ""); setEditingName(true) }}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                >
+                  <Pencil className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+          </div>
           {[
-            { label: "Name",         value: user?.name },
             { label: "Email",        value: user?.email },
             { label: "User ID",      value: user?.id },
             { label: "Member since", value: user?.created_at ? formatDate(user.created_at) : undefined },
@@ -95,6 +175,65 @@ export default function SettingsPage() {
               <span className="text-xs font-mono">{row.value ?? "—"}</span>
             </div>
           ))}
+        </div>
+
+        {/* change password */}
+        <div className="border border-border rounded-lg overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-border bg-card/50 flex items-center justify-between">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Password</p>
+            {!showPassword && (
+              <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setShowPassword(true)}>
+                Change
+              </Button>
+            )}
+          </div>
+          <div className="p-4">
+            {!showPassword ? (
+              <p className="text-xs text-muted-foreground">••••••••••••</p>
+            ) : (
+              <form onSubmit={handleChangePassword} className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Current password</Label>
+                  <Input
+                    type="password" value={currentPw}
+                    onChange={e => { setCurrentPw(e.target.value); pwErrors.current && setPwErrors(p => ({ ...p, current: "" })) }}
+                    className={cn("h-8 text-sm bg-input border-border", pwErrors.current && "border-destructive")}
+                    autoFocus
+                  />
+                  {pwErrors.current && <p className="text-xs text-destructive">{pwErrors.current}</p>}
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">New password</Label>
+                  <Input
+                    type="password" value={newPw}
+                    onChange={e => { setNewPw(e.target.value); pwErrors.new && setPwErrors(p => ({ ...p, new: "" })) }}
+                    placeholder="min. 8 characters"
+                    className={cn("h-8 text-sm bg-input border-border", pwErrors.new && "border-destructive")}
+                  />
+                  {pwErrors.new && <p className="text-xs text-destructive">{pwErrors.new}</p>}
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Confirm new password</Label>
+                  <Input
+                    type="password" value={confirmPw}
+                    onChange={e => { setConfirmPw(e.target.value); pwErrors.confirm && setPwErrors(p => ({ ...p, confirm: "" })) }}
+                    placeholder="repeat new password"
+                    className={cn("h-8 text-sm bg-input border-border", pwErrors.confirm && "border-destructive")}
+                  />
+                  {pwErrors.confirm && <p className="text-xs text-destructive">{pwErrors.confirm}</p>}
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button type="submit" size="sm" className="h-7 text-xs" disabled={pwSaving}>
+                    {pwSaving ? "Saving…" : "Update password"}
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" className="h-7 text-xs"
+                    onClick={() => { setShowPassword(false); setCurrentPw(""); setNewPw(""); setConfirmPw(""); setPwErrors({}) }}>
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
 
         {/* 2FA */}

@@ -5,12 +5,14 @@ import (
 	"dotkey/internal/auth"
 	"dotkey/internal/environment"
 	"dotkey/internal/project"
+	"dotkey/internal/ratelimit"
 	"dotkey/internal/search"
 	"dotkey/internal/token"
 	"dotkey/internal/user"
 	"dotkey/internal/variable"
 	"dotkey/internal/version"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -51,12 +53,14 @@ func (r *Router) Setup(engine *gin.Engine) {
 
 	v1 := engine.Group("/api/v1")
 
+	authRL := ratelimit.Login(10, 15*time.Minute)
+
 	// public
 	authGroup := v1.Group("/auth")
 	{
-		authGroup.POST("/register", r.authH.Register)
-		authGroup.POST("/login", r.authH.Login)
-		authGroup.POST("/login/2fa", r.authH.Login2FA)
+		authGroup.POST("/register", authRL, r.authH.Register)
+		authGroup.POST("/login", authRL, r.authH.Login)
+		authGroup.POST("/login/2fa", authRL, r.authH.Login2FA)
 		authGroup.POST("/device", r.authH.DeviceCode)
 		authGroup.GET("/device/poll", r.authH.DevicePoll)
 	}
@@ -71,7 +75,9 @@ func (r *Router) Setup(engine *gin.Engine) {
 		protected.POST("/auth/2fa/setup", r.authH.Setup2FA)
 		protected.POST("/auth/2fa/confirm", r.authH.Confirm2FA)
 		protected.DELETE("/auth/2fa", r.authH.Disable2FA)
-		protected.POST("/auth/reveal/unlock", r.authH.RevealUnlock)
+		protected.POST("/auth/reveal/unlock", authRL, r.authH.RevealUnlock)
+		protected.PUT("/auth/me", r.authH.UpdateMe)
+		protected.POST("/auth/change-password", r.authH.ChangePassword)
 
 		protected.GET("/users/search", user.Search)
 		protected.GET("/search", search.Search) // global search
@@ -94,6 +100,7 @@ func (r *Router) Setup(engine *gin.Engine) {
 			projects.PUT("/:id/environments/:eid", r.envH.Rename)
 			projects.PATCH("/:id/environments/:eid/lock", r.envH.Lock)
 			projects.DELETE("/:id/environments/:eid", r.envH.Delete)
+			projects.POST("/:id/environments/:eid/clone", r.envH.Clone)
 
 			projects.GET("/:id/diff", r.variableH.Diff)
 			projects.GET("/:id/activity", r.activityH.List) // activity feed

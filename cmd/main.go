@@ -8,7 +8,6 @@ import (
 	"dotkey/internal/auth"
 	"dotkey/internal/environment"
 	"dotkey/internal/project"
-	"dotkey/internal/ratelimit"
 	tkn "dotkey/internal/token"
 	"dotkey/internal/variable"
 	"dotkey/internal/version"
@@ -51,6 +50,7 @@ func main() {
 	projectSvc := project.NewService(projectRepo)
 	envSvc := environment.NewService(envRepo, projectSvc)
 	varSvc := variable.NewService(varRepo, envSvc, projectSvc, cryptoSvc)
+	envSvc.SetVariableCopier(varSvc)
 	tokenSvc := tkn.NewService(tokenRepo, projectSvc)
 
 	authH := auth.NewHandler(authSvc)
@@ -74,14 +74,6 @@ func main() {
 		c.Header("Vary", "Origin")
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
-			return
-		}
-		c.Next()
-	})
-
-	engine.Use(func(c *gin.Context) {
-		if c.Request.URL.Path == "/api/v1/auth/login" && c.Request.Method == "POST" {
-			ratelimit.Login(10, time.Minute)(c)
 			return
 		}
 		c.Next()

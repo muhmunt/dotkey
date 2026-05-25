@@ -222,6 +222,35 @@ func (s *Service) Import(projectID, envID, content, actorID string) (int, error)
 	return count, nil
 }
 
+// CopyToEnvironment upserts all variables from srcEnvID into dstEnvID.
+func (s *Service) CopyToEnvironment(projectID, srcEnvID, dstEnvID, actorID string) (int, error) {
+	if err := s.canEdit(projectID, actorID); err != nil {
+		return 0, err
+	}
+	src, err := s.repo.FindByEnvironment(srcEnvID)
+	if err != nil {
+		return 0, err
+	}
+	count := 0
+	for _, v := range src {
+		existing, err := s.repo.FindByKey(dstEnvID, v.Key)
+		if err != nil {
+			nv := &models.Variable{EnvironmentID: dstEnvID, Key: v.Key, Value: v.Value}
+			if s.repo.Create(nv) == nil {
+				s.saveVersion(nv.ID, dstEnvID, v.Key, v.Value, "created", actorID)
+				count++
+			}
+		} else {
+			existing.Value = v.Value
+			if s.repo.Update(existing) == nil {
+				s.saveVersion(existing.ID, dstEnvID, v.Key, v.Value, "updated", actorID)
+				count++
+			}
+		}
+	}
+	return count, nil
+}
+
 // Diff — all members can compare.
 type DiffEntry struct {
 	Key    string `json:"key"`

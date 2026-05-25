@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Terminal, Shield } from "lucide-react"
-import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -20,15 +20,18 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loginError, setLoginError] = useState("")
   const [loading, setLoading] = useState(false)
 
   const [stateToken, setStateToken] = useState("")
   const [totpCode, setTotpCode] = useState("")
+  const [totpError, setTotpError] = useState("")
   const [needs2FA, setNeeds2FA] = useState(false)
   const [verifying, setVerifying] = useState(false)
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
+    setLoginError("")
     setLoading(true)
     try {
       const result = await auth.login(email, password) as any
@@ -41,7 +44,7 @@ export default function LoginPage() {
         router.push(me.totp_enabled ? "/projects" : "/setup-2fa")
       }
     } catch (err: any) {
-      toast.error(err.message)
+      setLoginError(err.message)
     } finally {
       setLoading(false)
     }
@@ -49,13 +52,14 @@ export default function LoginPage() {
 
   async function handle2FA(e: React.FormEvent) {
     e.preventDefault()
+    setTotpError("")
     setVerifying(true)
     try {
       const { token } = await auth.login2fa(stateToken, totpCode)
       setToken(token)
-      router.push("/projects") // 2FA login means totp_enabled is true
+      router.push("/projects")
     } catch (err: any) {
-      toast.error(err.message)
+      setTotpError(err.message)
       setTotpCode("")
     } finally {
       setVerifying(false)
@@ -82,13 +86,18 @@ export default function LoginPage() {
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-xs font-medium text-muted-foreground">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-                    placeholder="you@example.com" required className="h-9 bg-input border-border" />
+                  <Input id="email" type="email" value={email}
+                    onChange={e => { setEmail(e.target.value); setLoginError("") }}
+                    placeholder="you@example.com" required
+                    className={cn("h-9 bg-input border-border", loginError && "border-destructive")} />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">Password</Label>
-                  <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)}
-                    placeholder="••••••••" required className="h-9 bg-input border-border" />
+                  <Input id="password" type="password" value={password}
+                    onChange={e => { setPassword(e.target.value); setLoginError("") }}
+                    placeholder="••••••••" required
+                    className={cn("h-9 bg-input border-border", loginError && "border-destructive")} />
+                  {loginError && <p className="text-xs text-destructive">{loginError}</p>}
                 </div>
                 <Button type="submit" disabled={loading} className="w-full h-9 btn-glow">
                   {loading ? "Signing in…" : "Sign in"}
@@ -111,15 +120,18 @@ export default function LoginPage() {
               Enter the 6-digit code from your authenticator app.
             </p>
             <form onSubmit={handle2FA} className="space-y-4">
-              <Input
-                value={totpCode}
-                onChange={e => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                placeholder="000 000"
-                className="h-13 text-center font-mono text-2xl tracking-[0.6em] bg-input border-border"
-                maxLength={6}
-                autoFocus
-                autoComplete="one-time-code"
-              />
+              <div className="space-y-1.5">
+                <Input
+                  value={totpCode}
+                  onChange={e => { setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); setTotpError("") }}
+                  placeholder="000 000"
+                  className={cn("h-13 text-center font-mono text-2xl tracking-[0.6em] bg-input border-border", totpError && "border-destructive")}
+                  maxLength={6}
+                  autoFocus
+                  autoComplete="one-time-code"
+                />
+                {totpError && <p className="text-xs text-destructive">{totpError}</p>}
+              </div>
               <Button type="submit" disabled={totpCode.length < 6 || verifying} className="w-full h-9 btn-glow">
                 {verifying ? "Verifying…" : "Verify"}
               </Button>

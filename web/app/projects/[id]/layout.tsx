@@ -4,16 +4,20 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { projects, environments } from "@/lib/api"
+import type { Environment } from "@/lib/api"
 import { AppShell } from "@/components/layout/app-shell"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import {
   Plus, GitCompare, History, Users, Settings, Pencil, Check, X,
-  Lock, Unlock, Activity, Plug, Key,
+  Lock, Unlock, Activity, Plug, Key, Copy,
 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog"
 
 const DOT_COLORS = [
   "bg-emerald-500","bg-blue-500","bg-violet-500",
@@ -33,16 +37,30 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const { data: envList = [] } = useQuery({ queryKey: ["environments", id], queryFn: () => environments.list(id) })
 
   const [newEnvName, setNewEnvName] = useState("")
+  const [newEnvError, setNewEnvError] = useState("")
   const [showNewEnv, setShowNewEnv] = useState(false)
   const [renamingEnvId, setRenamingEnvId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState("")
+  const [cloneSource, setCloneSource] = useState<Environment | null>(null)
+  const [cloneTargetId, setCloneTargetId] = useState("")
 
   const createEnv = useMutation({
     mutationFn: () => environments.create(id, newEnvName.trim()),
     onSuccess: (env) => {
       qc.invalidateQueries({ queryKey: ["environments", id] })
-      setNewEnvName(""); setShowNewEnv(false)
+      setNewEnvName(""); setNewEnvError(""); setShowNewEnv(false)
       window.location.href = `/projects/${id}/env/${env.id}`
+    },
+    onError: (err: any) => toast.error(err.message),
+  })
+
+  const cloneEnv = useMutation({
+    mutationFn: ({ srcId, dstId }: { srcId: string; dstId: string }) =>
+      environments.clone(id, srcId, dstId),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["variables"] })
+      setCloneSource(null); setCloneTargetId("")
+      toast.success(`${res.synced} variable${res.synced !== 1 ? "s" : ""} copied`)
     },
     onError: (err: any) => toast.error(err.message),
   })
@@ -110,12 +128,22 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
 
             {showNewEnv && (
               <form
-                onSubmit={e => { e.preventDefault(); createEnv.mutate() }}
-                className="px-2 pb-2 flex gap-1"
+                onSubmit={e => {
+                  e.preventDefault()
+                  const name = newEnvName.trim()
+                  if (!name) { setNewEnvError("Name is required"); return }
+                  if (/[\s/]/.test(name)) { setNewEnvError("No spaces or slashes"); return }
+                  setNewEnvError(""); createEnv.mutate()
+                }}
+                className="px-2 pb-1 space-y-1"
               >
-                <Input value={newEnvName} onChange={e => setNewEnvName(e.target.value)}
-                  placeholder="production" className="h-6 text-xs bg-input border-border" autoFocus />
-                <Button type="submit" size="sm" className="h-6 text-xs px-2" disabled={!newEnvName.trim()}>+</Button>
+                <div className="flex gap-1">
+                  <Input value={newEnvName}
+                    onChange={e => { setNewEnvName(e.target.value); newEnvError && setNewEnvError("") }}
+                    placeholder="production" className={cn("h-6 text-xs bg-input border-border", newEnvError && "border-destructive")} autoFocus />
+                  <Button type="submit" size="sm" className="h-6 text-xs px-2" disabled={createEnv.isPending}>+</Button>
+                </div>
+                {newEnvError && <p className="text-xs text-destructive px-0.5">{newEnvError}</p>}
               </form>
             )}
 
@@ -159,6 +187,13 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
                         <Pencil className="h-2.5 w-2.5" />
                       </button>
                       <button
+                        onClick={() => { setCloneSource(env); setCloneTargetId("") }}
+                        className="p-0.5 text-muted-foreground hover:text-foreground"
+                        title="Clone to another environment"
+                      >
+                        <Copy className="h-2.5 w-2.5" />
+                      </button>
+                      <button
                         onClick={() => toggleLock.mutate({ envId: env.id, locked: !env.locked })}
                         className="p-0.5 text-muted-foreground hover:text-foreground"
                         title={env.locked ? "Unlock" : "Lock"}
@@ -197,6 +232,41 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
         {/* main content */}
         <div className="flex-1 overflow-y-auto">{children}</div>
       </div>
+
+      {/* clone dialog */}
+      <Dialog open={!!cloneSource} onOpenChange={open => { if (!open) { setCloneSource(null); setCloneTargetId("") } }}>
+        <DialogContent className="sm:max-w-xs bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Clone environment</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-muted-foreground">
+            Copy all variables from <span className="font-mono font-medium text-foreground">{cloneSource?.name}</span> into:
+          </p>
+          <select
+            value={cloneTargetId}
+            onChange={e => setCloneTargetId(e.target.value)}
+            className="h-8 text-xs bg-input border border-border rounded px-2 text-foreground w-full"
+          >
+            <option value="">Select target environment…</option>
+            {envList.filter(e => e.id !== cloneSource?.id).map(e => (
+              <option key={e.id} value={e.id}>{e.name}{e.locked ? " (locked)" : ""}</option>
+            ))}
+          </select>
+          <p className="text-xs text-muted-foreground">Existing keys in the target will be overwritten.</p>
+          <DialogFooter className="gap-2">
+            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { setCloneSource(null); setCloneTargetId("") }}>
+              Cancel
+            </Button>
+            <Button
+              size="sm" className="h-7 text-xs"
+              disabled={!cloneTargetId || cloneEnv.isPending}
+              onClick={() => cloneSource && cloneEnv.mutate({ srcId: cloneSource.id, dstId: cloneTargetId })}
+            >
+              {cloneEnv.isPending ? "Copying…" : "Copy variables"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   )
 }

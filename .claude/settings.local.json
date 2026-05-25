@@ -12,7 +12,8 @@
       "Bash(mkdir -p /Users/muhammadmuntasir/.dotkey)",
       "Bash(cp /Users/muhammadmuntasir/.envx/config.yaml /Users/muhammadmuntasir/.dotkey/config.yaml)",
       "Bash(go mod *)",
-      "Bash(./dotkey --help)"
+      "Bash(./dotkey --help)",
+      "Bash(gh run *)"
     ]
   }
 }

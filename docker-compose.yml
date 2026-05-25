@@ -33,13 +33,13 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${API_URL:-http://localhost:8080}
     restart: unless-stopped
     ports:
       - "3000:3000"
     depends_on:
       - api
-    environment:
-      NEXT_PUBLIC_API_URL: ${API_URL:-http://localhost:8080}
 
 volumes:
   postgres_data:

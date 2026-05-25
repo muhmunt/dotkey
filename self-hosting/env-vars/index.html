@@ -764,6 +764,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#smtp-optional-for-future-notifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMTP (optional — for future notifications)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dashboard-build-time-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1027,6 +1038,34 @@
     
   
     Keyboard Shortcuts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dashboard/settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Account Settings
   
 
     
@@ -1330,6 +1369,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/webhooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Webhooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1434,6 +1501,34 @@
     
   
     Docker Compose
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/webhooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Webhooks
   
 
     
@@ -1647,6 +1742,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#smtp-optional-for-future-notifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMTP (optional — for future notifications)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dashboard-build-time-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1735,6 +1841,49 @@
 <td><code>API_URL</code></td>
 <td><code>http://localhost:8080</code></td>
 <td>API URL shown to the dashboard container</td>
+</tr>
+</tbody>
+</table>
+<h2 id="smtp-optional-for-future-notifications">SMTP (optional — for future notifications)<a class="headerlink" href="#smtp-optional-for-future-notifications" title="Permanent link">&para;</a></h2>
+<p>Password reset does <strong>not</strong> use email — it uses your authenticator app (TOTP). SMTP variables are reserved for future notification features and can be left unset.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SMTP_HOST</code></td>
+<td><em>(unset)</em></td>
+<td>SMTP server hostname — leave unset to disable email</td>
+</tr>
+<tr>
+<td><code>SMTP_PORT</code></td>
+<td><code>587</code></td>
+<td>SMTP server port</td>
+</tr>
+<tr>
+<td><code>SMTP_USER</code></td>
+<td><em>(unset)</em></td>
+<td>SMTP username</td>
+</tr>
+<tr>
+<td><code>SMTP_PASSWORD</code></td>
+<td><em>(unset)</em></td>
+<td>SMTP password</td>
+</tr>
+<tr>
+<td><code>SMTP_FROM</code></td>
+<td><code>noreply@dotkey.app</code></td>
+<td>From address for outgoing emails</td>
+</tr>
+<tr>
+<td><code>APP_URL</code></td>
+<td><code>http://localhost:3000</code></td>
+<td>Base URL of the dashboard — used in password-reset links</td>
 </tr>
 </tbody>
 </table>

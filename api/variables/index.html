@@ -16,7 +16,7 @@
         <link rel="prev" href="../projects/">
       
       
-        <link rel="next" href="../../integrations/github-actions/">
+        <link rel="next" href="../webhooks/">
       
       
         
@@ -957,6 +957,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dashboard/settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Account Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1377,6 +1405,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#clone-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clone environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#global-search" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1391,6 +1430,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webhooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Webhooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1500,6 +1567,34 @@
     
   
     Docker Compose
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/webhooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Webhooks
   
 
     
@@ -1779,6 +1874,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#clone-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clone environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#global-search" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1850,6 +1956,14 @@
 <h2 id="rollback">Rollback<a class="headerlink" href="#rollback" title="Permanent link">&para;</a></h2>
 <p><code>POST .../rollback/:versionId</code></p>
 <p>Restores a variable to its state at the given version. Adds a <code>rolled_back</code> entry to history.</p>
+<h2 id="clone-environment">Clone environment<a class="headerlink" href="#clone-environment" title="Permanent link">&para;</a></h2>
+<p><code>POST /api/v1/projects/:id/environments/:eid/clone</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;target_env_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;target environment id&gt;&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Copies all variables from the source environment into the target (upserts — existing keys are overwritten). Requires at least <strong>developer</strong> role. Returns 400 if the target environment is locked.</p>
+<p><strong>Response:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;synced&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div></p>
 <h2 id="global-search">Global search<a class="headerlink" href="#global-search" title="Permanent link">&para;</a></h2>
 <p><code>GET /api/v1/search?q=DATABASE</code></p>
 <p>Searches project names and variable keys across all accessible projects.</p>

@@ -21,6 +21,10 @@
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
+         <loc>https://muhmunt.github.io/dotkey/api/webhooks/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
          <loc>https://muhmunt.github.io/dotkey/cli/authentication/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
@@ -50,6 +54,10 @@
     </url>
     <url>
          <loc>https://muhmunt.github.io/dotkey/dashboard/projects/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/dashboard/settings/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>
@@ -86,6 +94,10 @@
     </url>
     <url>
          <loc>https://muhmunt.github.io/dotkey/integrations/github-actions/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://muhmunt.github.io/dotkey/integrations/webhooks/</loc>
          <lastmod>2026-05-25</lastmod>
     </url>
     <url>

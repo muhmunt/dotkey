@@ -957,6 +957,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dashboard/settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Account Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1299,6 +1327,61 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#update-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update name
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change password
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forgot-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forgot password
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reset-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reset password
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delete account
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reveal-lock" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1361,6 +1444,34 @@
     
   
     Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webhooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Webhooks
   
 
     
@@ -1478,6 +1589,34 @@
     
   
     Docker Compose
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/webhooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Webhooks
   
 
     
@@ -1735,6 +1874,61 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#update-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update name
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change password
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forgot-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forgot password
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reset-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reset password
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delete account
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reveal-lock" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1829,10 +2023,35 @@
 </tr>
 </tbody>
 </table>
+<h2 id="update-name">Update name<a class="headerlink" href="#update-name" title="Permanent link">&para;</a></h2>
+<p><code>PUT /api/v1/auth/me</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New Name&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Returns the updated user object.</p>
+<h2 id="change-password">Change password<a class="headerlink" href="#change-password" title="Permanent link">&para;</a></h2>
+<p><code>POST /api/v1/auth/change-password</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;current_password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;oldpassword&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;new_password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;newpassword&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Requires at least 8 characters for the new password.</p>
+<h2 id="forgot-password">Forgot password<a class="headerlink" href="#forgot-password" title="Permanent link">&para;</a></h2>
+<p><code>POST /api/v1/auth/forgot-password</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;email&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;you@example.com&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Always returns 200 — does not reveal whether the email exists. If <code>SMTP_HOST</code> is configured, sends a reset link to the address.</p>
+<h2 id="reset-password">Reset password<a class="headerlink" href="#reset-password" title="Permanent link">&para;</a></h2>
+<p><code>POST /api/v1/auth/reset-password</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;token&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;raw token from email link&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;new_password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;newpassword&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Token is valid for 1 hour and single-use.</p>
+<h2 id="delete-account">Delete account<a class="headerlink" href="#delete-account" title="Permanent link">&para;</a></h2>
+<p><code>DELETE /api/v1/auth/me</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;yourpassword&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Permanently deletes the account. Returns 400 if the user is the sole owner of any project — transfer or delete those projects first.</p>
 <h2 id="reveal-lock">Reveal lock<a class="headerlink" href="#reveal-lock" title="Permanent link">&para;</a></h2>
 <p>When 2FA is enabled, the export endpoint additionally requires <code>X-Reveal-Token</code>:</p>
 <p><code>POST /api/v1/auth/reveal/unlock</code> — returns a reveal token valid for 15 minutes.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>X-Reveal-Token: eyJhbGciOi...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>X-Reveal-Token: eyJhbGciOi...
 </code></pre></div>
 
 

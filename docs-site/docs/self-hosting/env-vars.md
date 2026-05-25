@@ -2,6 +2,46 @@
 
 All variables are set in the `.env` file at the repo root.
 
+## Encrypting your .env (recommended for production)
+
+dotkey supports **Pattern A** value-level encryption — sensitive values are encrypted in-place while non-secret values (`PORT`, `ALLOWED_ORIGINS`) stay readable.
+
+```bash
+# 1. Build the encryption tool
+go build -o dotkey-enc ./tools/envenc
+
+# 2. Generate a master key (keep this secret — never put it in .env)
+./dotkey-enc keygen
+# → DOTKEY_MASTER_KEY=499601be72f5...
+
+# 3. Export the master key in your shell
+export DOTKEY_MASTER_KEY=499601be72f5...
+
+# 4. Encrypt the sensitive values in your .env
+./dotkey-enc encrypt .env
+# → JWT_SECRET=encrypted:v1:KaQP...:og_E...
+# → ENCRYPTION_KEY=encrypted:v1:lV7A...:J6rL...
+# → DATABASE_URL=encrypted:v1:HciG...:hyrF...
+
+# 5. Preview decrypted values at any time (does not modify the file)
+./dotkey-enc decrypt .env
+
+# 6. Encrypt specific keys only
+./dotkey-enc encrypt .env JWT_SECRET ENCRYPTION_KEY
+```
+
+At server startup, set `DOTKEY_MASTER_KEY` in the environment (Docker secret, systemd credential, shell) — the server automatically decrypts any `encrypted:v1:…` values before reading the config.
+
+```bash
+DOTKEY_MASTER_KEY=<key> ./dotkey-api
+```
+
+!!! warning "Never store DOTKEY_MASTER_KEY in .env"
+    The master key must come from outside the `.env` file — a Docker secret,
+    a `systemd` `EnvironmentFile` with restricted permissions, or an operator's
+    shell. If the master key and the encrypted `.env` are in the same place,
+    encryption provides no protection.
+
 ## Required
 
 | Variable | Description | Example |

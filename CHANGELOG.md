@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `.env` value-level encryption (Pattern A) — `tools/envenc` (`dotkey-enc`) binary to encrypt/decrypt sensitive values in `.env` using AES-256-GCM; server auto-decrypts at startup when `DOTKEY_MASTER_KEY` is set
+- CLI auth token encrypted at rest in `~/.dotkey/config.yaml` using a per-machine key (`~/.dotkey/key`, mode 0600)
 - Mandatory 2FA onboarding — new users are redirected to `/setup-2fa` immediately after registration and cannot access the dashboard until setup is complete
 - JWT refresh tokens — sessions silently refresh when fewer than 1 hour remains, preventing unexpected logouts
 - JWT revocation blocklist — logout invalidates the token server-side (DB-backed JTI blocklist, expired entries purged every 10 min)

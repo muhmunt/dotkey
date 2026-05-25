@@ -14,7 +14,9 @@ import (
 	"dotkey/internal/webhook"
 	"dotkey/models"
 	"dotkey/pkg/crypto"
+	"dotkey/pkg/envenc"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -24,6 +26,15 @@ import (
 
 func main() {
 	_ = godotenv.Load()
+
+	// If DOTKEY_MASTER_KEY is set, decrypt any "encrypted:v1:…" values in the
+	// loaded environment before the config is read. This lets operators store
+	// JWT_SECRET, ENCRYPTION_KEY, DATABASE_URL etc. encrypted in .env.
+	if mk := os.Getenv("DOTKEY_MASTER_KEY"); mk != "" {
+		if err := envenc.DecryptOSEnv(mk); err != nil {
+			log.Fatalf("dotkey-enc: failed to decrypt environment: %v", err)
+		}
+	}
 
 	cfg := config.Load()
 	db.Init(cfg)

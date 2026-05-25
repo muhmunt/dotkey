@@ -19,6 +19,19 @@ All variables are set in the `.env` file at the repo root.
 | `DB_PASSWORD` | `dotkey` | Postgres password (Docker Compose only) |
 | `API_URL` | `http://localhost:8080` | API URL shown to the dashboard container |
 
+## SMTP (optional — enables password reset)
+
+If `SMTP_HOST` is not set, the forgot-password endpoint returns an error and no email is sent. All other features work without SMTP.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SMTP_HOST` | _(unset)_ | SMTP server hostname — leave unset to disable email |
+| `SMTP_PORT` | `587` | SMTP server port |
+| `SMTP_USER` | _(unset)_ | SMTP username |
+| `SMTP_PASSWORD` | _(unset)_ | SMTP password |
+| `SMTP_FROM` | `noreply@dotkey.app` | From address for outgoing emails |
+| `APP_URL` | `http://localhost:3000` | Base URL of the dashboard — used in password-reset links |
+
 ## Dashboard build-time variables
 
 The Next.js dashboard has one additional variable that must be set **before building the image**:

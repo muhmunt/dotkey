@@ -92,7 +92,10 @@ export default function LoginPage() {
                     className={cn("h-9 bg-input border-border", loginError && "border-destructive")} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">Password</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">Password</Label>
+                    <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary transition-colors">Forgot password?</Link>
+                  </div>
                   <Input id="password" type="password" value={password}
                     onChange={e => { setPassword(e.target.value); setLoginError("") }}
                     placeholder="••••••••" required

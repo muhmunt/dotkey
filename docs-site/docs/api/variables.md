@@ -77,6 +77,21 @@ Returns the full change log for the environment, newest first.
 
 Restores a variable to its state at the given version. Adds a `rolled_back` entry to history.
 
+## Clone environment
+
+`POST /api/v1/projects/:id/environments/:eid/clone`
+
+```json
+{ "target_env_id": "<target environment id>" }
+```
+
+Copies all variables from the source environment into the target (upserts — existing keys are overwritten). Requires at least **developer** role. Returns 400 if the target environment is locked.
+
+**Response:**
+```json
+{ "synced": 5 }
+```
+
 ## Global search
 
 `GET /api/v1/search?q=DATABASE`

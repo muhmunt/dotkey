@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import {
   Plus, GitCompare, History, Users, Settings, Pencil, Check, X,
-  Lock, Unlock, Activity, Plug, Key, Copy,
+  Lock, Unlock, Activity, Plug, Key, Copy, Webhook,
 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -92,6 +92,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     { href: `/projects/${id}/activity`,      icon: Activity,   label: "Activity" },
     { href: `/projects/${id}/members`,       icon: Users,      label: "Members" },
     { href: `/projects/${id}/tokens`,        icon: Key,        label: "Tokens" },
+    { href: `/projects/${id}/webhooks`,      icon: Webhook,    label: "Webhooks" },
     { href: `/projects/${id}/integrations`,  icon: Plug,       label: "Integrations" },
     { href: `/projects/${id}/settings`,      icon: Settings,   label: "Settings" },
   ]

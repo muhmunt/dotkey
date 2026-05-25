@@ -11,6 +11,7 @@ import (
 	"dotkey/internal/user"
 	"dotkey/internal/variable"
 	"dotkey/internal/version"
+	"dotkey/internal/webhook"
 	"net/http"
 	"time"
 
@@ -26,6 +27,7 @@ type Router struct {
 	versionH  *version.Handler
 	tokenH    *token.Handler
 	activityH *activity.Handler
+	webhookH  *webhook.Handler
 }
 
 func NewRouter(
@@ -37,12 +39,14 @@ func NewRouter(
 	versionH *version.Handler,
 	tokenH *token.Handler,
 	activityH *activity.Handler,
+	webhookH *webhook.Handler,
 ) *Router {
 	return &Router{
 		authSvc: authSvc, authH: authH,
 		projectH: projectH, envH: envH,
 		variableH: variableH, versionH: versionH,
 		tokenH: tokenH, activityH: activityH,
+		webhookH: webhookH,
 	}
 }
 
@@ -61,6 +65,8 @@ func (r *Router) Setup(engine *gin.Engine) {
 		authGroup.POST("/register", authRL, r.authH.Register)
 		authGroup.POST("/login", authRL, r.authH.Login)
 		authGroup.POST("/login/2fa", authRL, r.authH.Login2FA)
+		authGroup.POST("/forgot-password", authRL, r.authH.ForgotPassword)
+		authGroup.POST("/reset-password", authRL, r.authH.ResetPassword)
 		authGroup.POST("/device", r.authH.DeviceCode)
 		authGroup.GET("/device/poll", r.authH.DevicePoll)
 	}
@@ -78,6 +84,7 @@ func (r *Router) Setup(engine *gin.Engine) {
 		protected.POST("/auth/reveal/unlock", authRL, r.authH.RevealUnlock)
 		protected.PUT("/auth/me", r.authH.UpdateMe)
 		protected.POST("/auth/change-password", r.authH.ChangePassword)
+		protected.DELETE("/auth/me", r.authH.DeleteMe)
 
 		protected.GET("/users/search", user.Search)
 		protected.GET("/search", search.Search) // global search
@@ -104,9 +111,13 @@ func (r *Router) Setup(engine *gin.Engine) {
 
 			projects.GET("/:id/diff", r.variableH.Diff)
 			projects.GET("/:id/activity", r.activityH.List) // activity feed
-			projects.GET("/:id/tokens", r.tokenH.List)       // CI/CD tokens
+			projects.GET("/:id/tokens", r.tokenH.List)
 			projects.POST("/:id/tokens", r.tokenH.Create)
 			projects.DELETE("/:id/tokens/:tid", r.tokenH.Revoke)
+
+			projects.GET("/:id/webhooks", r.webhookH.List)
+			projects.POST("/:id/webhooks", r.webhookH.Create)
+			projects.DELETE("/:id/webhooks/:wid", r.webhookH.Delete)
 
 			envVars := projects.Group("/:id/environments/:eid")
 			{

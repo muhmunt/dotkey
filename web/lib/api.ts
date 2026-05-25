@@ -80,6 +80,18 @@ export const auth = {
     req<{ reveal_token: string; expires_in: number }>("/api/v1/auth/reveal/unlock", {
       method: "POST", body: JSON.stringify({ code }),
     }),
+  forgotPassword: (email: string) =>
+    req<{ message: string }>("/api/v1/auth/forgot-password", {
+      method: "POST", body: JSON.stringify({ email }),
+    }),
+  resetPassword: (token: string, new_password: string) =>
+    req<{ message: string }>("/api/v1/auth/reset-password", {
+      method: "POST", body: JSON.stringify({ token, new_password }),
+    }),
+  deleteMe: (password: string) =>
+    req<{ message: string }>("/api/v1/auth/me", {
+      method: "DELETE", body: JSON.stringify({ password }),
+    }),
 }
 
 // ── Users ─────────────────────────────────────────────────────────────────────
@@ -235,6 +247,28 @@ export const variables = {
     }),
   diff: (projectId: string, fromEnvId: string, toEnvId: string) =>
     req<DiffEntry[]>(`/api/v1/projects/${projectId}/diff?from=${fromEnvId}&to=${toEnvId}`),
+}
+
+// ── Webhooks ──────────────────────────────────────────────────────────────────
+
+export interface Webhook {
+  id: string
+  project_id: string
+  url: string
+  events: string[]
+  active: boolean
+  created_at: string
+}
+
+export const webhooks = {
+  list: (projectId: string) =>
+    req<Webhook[]>(`/api/v1/projects/${projectId}/webhooks`),
+  create: (projectId: string, url: string, events: string[]) =>
+    req<Webhook>(`/api/v1/projects/${projectId}/webhooks`, {
+      method: "POST", body: JSON.stringify({ url, events }),
+    }),
+  delete: (projectId: string, webhookId: string) =>
+    req<void>(`/api/v1/projects/${projectId}/webhooks/${webhookId}`, { method: "DELETE" }),
 }
 
 // ── History & Rollback ────────────────────────────────────────────────────────

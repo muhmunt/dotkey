@@ -20,15 +20,30 @@ type ProjectAccess interface {
 	GetMemberRole(projectID, userID string) (string, error)
 }
 
+// WebhookDeliverer is satisfied by webhook.Service.
+type WebhookDeliverer interface {
+	Deliver(projectID, envID, envName, key, event, actor string)
+}
+
 type Service struct {
-	repo    *Repository
-	envSvc  EnvAccess
-	projSvc ProjectAccess
-	crypto  *crypto.Crypto
+	repo     *Repository
+	envSvc   EnvAccess
+	projSvc  ProjectAccess
+	crypto   *crypto.Crypto
+	webhooks WebhookDeliverer
 }
 
 func NewService(repo *Repository, envSvc EnvAccess, projSvc ProjectAccess, c *crypto.Crypto) *Service {
 	return &Service{repo: repo, envSvc: envSvc, projSvc: projSvc, crypto: c}
+}
+
+func (s *Service) SetWebhookDeliverer(w WebhookDeliverer) { s.webhooks = w }
+
+func (s *Service) fireWebhook(projectID, envID, envName, key, event, actorID string) {
+	if s.webhooks == nil {
+		return
+	}
+	go s.webhooks.Deliver(projectID, envID, envName, key, event, actorID)
 }
 
 type VariableResponse struct {
@@ -106,6 +121,7 @@ func (s *Service) Create(projectID, envID, key, value, actorID string) (*Variabl
 		return nil, fmt.Errorf("variable %q already exists in this environment", key)
 	}
 	s.saveVersion(v.ID, envID, key, encrypted, "created", actorID)
+	s.fireWebhook(projectID, envID, env.Name, key, "variable.created", actorID)
 	return &VariableResponse{ID: v.ID, EnvironmentID: envID, Key: key, Value: "***", CreatedAt: v.CreatedAt, UpdatedAt: v.UpdatedAt}, nil
 }
 
@@ -134,6 +150,7 @@ func (s *Service) Update(projectID, envID, varID, value, actorID string) (*Varia
 		return nil, err
 	}
 	s.saveVersion(v.ID, envID, v.Key, encrypted, "updated", actorID)
+	s.fireWebhook(projectID, envID, env.Name, v.Key, "variable.updated", actorID)
 	return &VariableResponse{ID: v.ID, EnvironmentID: envID, Key: v.Key, Value: "***", CreatedAt: v.CreatedAt, UpdatedAt: v.UpdatedAt}, nil
 }
 
@@ -154,6 +171,7 @@ func (s *Service) Delete(projectID, envID, varID, actorID string) error {
 		return errors.New("variable not found")
 	}
 	s.saveVersion(v.ID, envID, v.Key, v.Value, "deleted", actorID)
+	s.fireWebhook(projectID, envID, env.Name, v.Key, "variable.deleted", actorID)
 	return s.repo.Delete(varID)
 }
 

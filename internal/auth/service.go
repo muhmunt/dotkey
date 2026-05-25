@@ -1,11 +1,16 @@
 package auth
 
 import (
+	"crypto/rand"
+	"crypto/sha256"
 	"dotkey/config"
 	"dotkey/db"
+	"dotkey/internal/email"
 	"dotkey/models"
 	"dotkey/pkg/crypto"
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -19,10 +24,11 @@ import (
 type Service struct {
 	cfg    *config.Config
 	crypto *crypto.Crypto
+	mailer *email.Sender
 }
 
 func NewService(cfg *config.Config, c *crypto.Crypto) *Service {
-	return &Service{cfg: cfg, crypto: c}
+	return &Service{cfg: cfg, crypto: c, mailer: email.New(cfg)}
 }
 
 // ── Standard auth claims ─────────────────────────────────────────────────────
@@ -60,6 +66,108 @@ type LoginResult struct {
 	Token       string // set when 2FA not enabled
 	Requires2FA bool   // set when 2FA is enabled
 	StateToken  string // short-lived token to carry through the 2FA step
+}
+
+// ── Password reset ────────────────────────────────────────────────────────────
+
+func (s *Service) RequestPasswordReset(email string) error {
+	var user models.User
+	if err := db.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil // silent — don't reveal whether email exists
+	}
+
+	raw := make([]byte, 32)
+	if _, err := rand.Read(raw); err != nil {
+		return err
+	}
+	rawHex := hex.EncodeToString(raw)
+	hash := sha256.Sum256([]byte(rawHex))
+	tokenHash := hex.EncodeToString(hash[:])
+
+	db.DB.Where("user_id = ? AND used_at IS NULL", user.ID).Delete(&models.PasswordResetToken{})
+
+	db.DB.Create(&models.PasswordResetToken{
+		Token:     tokenHash,
+		UserID:    user.ID,
+		ExpiresAt: time.Now().Add(time.Hour),
+	})
+
+	resetURL := fmt.Sprintf("%s/reset-password?token=%s", s.cfg.AppURL, rawHex)
+	go s.mailer.SendPasswordReset(user.Email, resetURL) //nolint:errcheck — best effort
+	return nil
+}
+
+func (s *Service) ResetPassword(rawToken, newPassword string) error {
+	hash := sha256.Sum256([]byte(rawToken))
+	tokenHash := hex.EncodeToString(hash[:])
+
+	var prt models.PasswordResetToken
+	if err := db.DB.Where("token = ? AND used_at IS NULL", tokenHash).First(&prt).Error; err != nil {
+		return errors.New("invalid or expired reset link")
+	}
+	if time.Now().After(prt.ExpiresAt) {
+		return errors.New("reset link has expired")
+	}
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	if err := db.DB.Model(&models.User{}).Where("id = ?", prt.UserID).Update("password_hash", string(hashed)).Error; err != nil {
+		return err
+	}
+
+	now := time.Now()
+	db.DB.Model(&prt).Update("used_at", &now)
+	return nil
+}
+
+// ── Delete account ────────────────────────────────────────────────────────────
+
+func (s *Service) DeleteAccount(userID, password string) error {
+	var user models.User
+	if err := db.DB.First(&user, "id = ?", userID).Error; err != nil {
+		return errors.New("user not found")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		return errors.New("password is incorrect")
+	}
+
+	// Block if sole owner of any project
+	var soleOwned []string
+	rows, err := db.DB.Raw(`
+		SELECT p.name FROM projects p
+		JOIN project_members pm ON pm.project_id = p.id
+		WHERE pm.user_id = ? AND pm.role = 'owner'
+		AND (SELECT COUNT(*) FROM project_members WHERE project_id = p.id AND role = 'owner') = 1
+	`, userID).Rows()
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var name string
+			rows.Scan(&name) //nolint:errcheck
+			soleOwned = append(soleOwned, name)
+		}
+	}
+	if len(soleOwned) > 0 {
+		return fmt.Errorf("you are the sole owner of: %s — transfer ownership or delete these projects first", joinNames(soleOwned))
+	}
+
+	db.DB.Where("user_id = ?", userID).Delete(&models.PasswordResetToken{})
+	db.DB.Where("user_id = ?", userID).Delete(&models.DeviceCode{})
+	db.DB.Where("user_id = ?", userID).Delete(&models.ProjectMember{})
+	return db.DB.Delete(&user).Error
+}
+
+func joinNames(names []string) string {
+	if len(names) == 1 {
+		return fmt.Sprintf("%q", names[0])
+	}
+	out := make([]string, len(names))
+	for i, n := range names {
+		out[i] = fmt.Sprintf("%q", n)
+	}
+	return out[0]
 }
 
 // ── Account management ────────────────────────────────────────────────────────

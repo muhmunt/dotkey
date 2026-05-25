@@ -1,7 +1,9 @@
 "use client"
 
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
 import { auth } from "@/lib/api"
+import { clearToken } from "@/lib/auth"
 import { AppShell } from "@/components/layout/app-shell"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,6 +16,7 @@ import { cn } from "@/lib/utils"
 import QRCode from "react-qr-code"
 
 export default function SettingsPage() {
+  const router = useRouter()
   const qc = useQueryClient()
   const { data: user, refetch } = useQuery({ queryKey: ["me"], queryFn: auth.me })
 
@@ -29,6 +32,28 @@ export default function SettingsPage() {
   const [confirmPw, setConfirmPw] = useState("")
   const [pwErrors, setPwErrors] = useState<Record<string, string>>({})
   const [pwSaving, setPwSaving] = useState(false)
+
+  // delete account
+  const [showDelete, setShowDelete] = useState(false)
+  const [deletePw, setDeletePw] = useState("")
+  const [deletePwError, setDeletePwError] = useState("")
+  const [deleteLoading, setDeleteLoading] = useState(false)
+
+  async function handleDeleteAccount(e: React.FormEvent) {
+    e.preventDefault()
+    if (!deletePw) { setDeletePwError("Password is required"); return }
+    setDeletePwError("")
+    setDeleteLoading(true)
+    try {
+      await auth.deleteMe(deletePw)
+      clearToken()
+      router.push("/register")
+    } catch (err: any) {
+      setDeletePwError(err.message)
+    } finally {
+      setDeleteLoading(false)
+    }
+  }
 
   // 2FA setup state
   const [qrURL, setQrURL] = useState("")
@@ -431,6 +456,61 @@ export default function SettingsPage() {
             >
               View all shortcuts →
             </button>
+          </div>
+        </div>
+
+        {/* danger zone */}
+        <div className="border border-destructive/30 rounded-lg overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-destructive/30 bg-destructive/5">
+            <p className="text-xs font-medium text-destructive uppercase tracking-wider">Danger zone</p>
+          </div>
+          <div className="p-4">
+            {!showDelete ? (
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium">Delete account</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Permanently remove your account. This cannot be undone.
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0 ml-4"
+                  onClick={() => setShowDelete(true)}
+                >
+                  Delete account
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleDeleteAccount} className="space-y-3">
+                <p className="text-xs text-muted-foreground">
+                  Enter your password to confirm account deletion. This action is permanent.
+                </p>
+                <Input
+                  type="password" value={deletePw}
+                  onChange={e => { setDeletePw(e.target.value); deletePwError && setDeletePwError("") }}
+                  placeholder="your current password"
+                  className={cn("h-8 text-sm bg-input border-border", deletePwError && "border-destructive")}
+                  autoFocus
+                />
+                {deletePwError && <p className="text-xs text-destructive">{deletePwError}</p>}
+                <div className="flex gap-2">
+                  <Button
+                    type="submit" variant="destructive" size="sm"
+                    className="h-7 text-xs" disabled={deleteLoading}
+                  >
+                    {deleteLoading ? "Deleting…" : "Permanently delete"}
+                  </Button>
+                  <Button
+                    type="button" variant="ghost" size="sm" className="h-7 text-xs"
+                    onClick={() => { setShowDelete(false); setDeletePw(""); setDeletePwError("") }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       </div>

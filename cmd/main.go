@@ -11,6 +11,7 @@ import (
 	tkn "dotkey/internal/token"
 	"dotkey/internal/variable"
 	"dotkey/internal/version"
+	"dotkey/internal/webhook"
 	"dotkey/models"
 	"dotkey/pkg/crypto"
 	"log"
@@ -34,6 +35,7 @@ func main() {
 			now := time.Now()
 			db.DB.Where("expires_at < ?", now).Delete(&models.DeviceCode{})
 			db.DB.Where("expires_at < ?", now).Delete(&models.RevokedToken{})
+			db.DB.Where("expires_at < ?", now).Delete(&models.PasswordResetToken{})
 		}
 	}()
 
@@ -51,6 +53,9 @@ func main() {
 	envSvc := environment.NewService(envRepo, projectSvc)
 	varSvc := variable.NewService(varRepo, envSvc, projectSvc, cryptoSvc)
 	envSvc.SetVariableCopier(varSvc)
+	webhookRepo := webhook.NewRepository()
+	webhookSvc := webhook.NewService(webhookRepo, projectSvc)
+	varSvc.SetWebhookDeliverer(webhookSvc)
 	tokenSvc := tkn.NewService(tokenRepo, projectSvc)
 
 	authH := auth.NewHandler(authSvc)
@@ -60,6 +65,7 @@ func main() {
 	versionH := version.NewHandler(versionRepo, envSvc)
 	tokenH := tkn.NewHandler(tokenSvc)
 	activityH := activity.NewHandler(activityRepo, projectSvc)
+	webhookH := webhook.NewHandler(webhookSvc)
 
 	engine := gin.Default()
 
@@ -79,7 +85,7 @@ func main() {
 		c.Next()
 	})
 
-	router := api.NewRouter(authSvc, authH, projectH, envH, varH, versionH, tokenH, activityH)
+	router := api.NewRouter(authSvc, authH, projectH, envH, varH, versionH, tokenH, activityH, webhookH)
 	router.Setup(engine)
 
 	log.Printf("EnvX API running on :%s (origins: %s)", cfg.Port, cfg.AllowedOrigins)

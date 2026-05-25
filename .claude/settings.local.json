@@ -13,7 +13,8 @@
       "Bash(cp /Users/muhammadmuntasir/.envx/config.yaml /Users/muhammadmuntasir/.dotkey/config.yaml)",
       "Bash(go mod *)",
       "Bash(./dotkey --help)",
-      "Bash(gh run *)"
+      "Bash(gh run *)",
+      "Bash(git commit *)"
     ]
   }
 }

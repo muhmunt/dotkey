@@ -77,6 +77,56 @@ Authorization: Bearer dotkey_tok_a1b2c3d4e5f6...
 | Poll | `GET /api/v1/auth/device/poll?device_code=...` |
 | Approve | `POST /api/v1/auth/device/activate` |
 
+## Update name
+
+`PUT /api/v1/auth/me`
+
+```json
+{ "name": "New Name" }
+```
+
+Returns the updated user object.
+
+## Change password
+
+`POST /api/v1/auth/change-password`
+
+```json
+{ "current_password": "oldpassword", "new_password": "newpassword" }
+```
+
+Requires at least 8 characters for the new password.
+
+## Forgot password
+
+`POST /api/v1/auth/forgot-password`
+
+```json
+{ "email": "you@example.com" }
+```
+
+Always returns 200 — does not reveal whether the email exists. If `SMTP_HOST` is configured, sends a reset link to the address.
+
+## Reset password
+
+`POST /api/v1/auth/reset-password`
+
+```json
+{ "token": "<raw token from email link>", "new_password": "newpassword" }
+```
+
+Token is valid for 1 hour and single-use.
+
+## Delete account
+
+`DELETE /api/v1/auth/me`
+
+```json
+{ "password": "yourpassword" }
+```
+
+Permanently deletes the account. Returns 400 if the user is the sole owner of any project — transfer or delete those projects first.
+
 ## Reveal lock
 
 When 2FA is enabled, the export endpoint additionally requires `X-Reveal-Token`:

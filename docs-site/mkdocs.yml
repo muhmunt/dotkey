@@ -50,6 +50,7 @@ nav:
       - API Tokens: dashboard/tokens.md
       - Team Management: dashboard/team.md
       - Keyboard Shortcuts: dashboard/shortcuts.md
+      - Account Settings: dashboard/settings.md
   - CLI:
       - Installation: cli/installation.md
       - Authentication: cli/authentication.md
@@ -58,9 +59,11 @@ nav:
       - Authentication: api/authentication.md
       - Projects: api/projects.md
       - Variables: api/variables.md
+      - Webhooks: api/webhooks.md
   - Integrations:
       - GitHub Actions: integrations/github-actions.md
       - Docker Compose: integrations/docker.md
+      - Webhooks: integrations/webhooks.md
   - Contributing:
       - How to Contribute: contributing/index.md
       - Architecture: contributing/architecture.md

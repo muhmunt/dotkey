@@ -7,7 +7,15 @@ type Config struct {
 	JWTSecret      string
 	EncryptionKey  string
 	Port           string
-	AllowedOrigins string // comma-separated, e.g. "http://localhost:3000,https://app.envx.io"
+	AllowedOrigins string
+
+	// SMTP — all optional; if SMTPHost is empty email sending is disabled
+	SMTPHost     string
+	SMTPPort     string
+	SMTPUser     string
+	SMTPPassword string
+	SMTPFrom     string
+	AppURL       string // base URL for password-reset links, e.g. https://app.example.com
 }
 
 func Load() *Config {
@@ -17,6 +25,12 @@ func Load() *Config {
 		EncryptionKey:  mustEnv("ENCRYPTION_KEY"),
 		Port:           getEnv("PORT", "8080"),
 		AllowedOrigins: getEnv("ALLOWED_ORIGINS", "http://localhost:3000"),
+		SMTPHost:       os.Getenv("SMTP_HOST"),
+		SMTPPort:       getEnv("SMTP_PORT", "587"),
+		SMTPUser:       os.Getenv("SMTP_USER"),
+		SMTPPassword:   os.Getenv("SMTP_PASSWORD"),
+		SMTPFrom:       getEnv("SMTP_FROM", "noreply@dotkey.app"),
+		AppURL:         getEnv("APP_URL", "http://localhost:3000"),
 	}
 }
 

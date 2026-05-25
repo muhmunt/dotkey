@@ -65,6 +65,7 @@ func (r *Router) Setup(engine *gin.Engine) {
 	protected := v1.Group("/", r.authSvc.Middleware())
 	{
 		protected.GET("/auth/me", r.authH.Me)
+		protected.POST("/auth/refresh", r.authH.Refresh)
 		protected.POST("/auth/device/activate", r.authH.DeviceActivate)
 		protected.POST("/auth/2fa/setup", r.authH.Setup2FA)
 		protected.POST("/auth/2fa/confirm", r.authH.Confirm2FA)

@@ -47,6 +47,7 @@ export const auth = {
       method: "POST", body: JSON.stringify({ email, password }),
     }),
   me: () => req<User>("/api/v1/auth/me"),
+  refresh: () => req<{ token: string }>("/api/v1/auth/refresh", { method: "POST" }),
   deviceCode: () =>
     req<{ device_code: string; user_code: string; expires_in: number }>("/api/v1/auth/device", { method: "POST" }),
   deviceActivate: (user_code: string) =>

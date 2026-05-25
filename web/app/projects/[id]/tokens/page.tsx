@@ -228,14 +228,14 @@ export default function TokensPage() {
           <p className="text-xs font-semibold">Usage in GitHub Actions</p>
         </div>
         <div className="p-4 space-y-2">
-          <p className="text-xs text-muted-foreground">Add your token to GitHub Secrets as <code className="font-mono text-foreground">ENVX_TOKEN</code>, then:</p>
+          <p className="text-xs text-muted-foreground">Add your token to GitHub Secrets as <code className="font-mono text-foreground">DOTKEY_TOKEN</code>, then:</p>
           <CodeBlock
             prompt={false}
             code={`- name: Pull env vars
   run: dotkey pull production
   env:
-    ENVX_TOKEN: \${{ secrets.ENVX_TOKEN }}
-    ENVX_API_URL: http://localhost:8080`}
+    DOTKEY_TOKEN: \${{ secrets.DOTKEY_TOKEN }}
+    DOTKEY_API_URL: http://localhost:8080`}
           />
         </div>
       </div>

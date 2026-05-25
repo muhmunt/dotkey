@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { isLoggedIn } from "@/lib/auth"
+import { isLoggedIn, isTokenExpiringSoon, setToken } from "@/lib/auth"
+import { auth } from "@/lib/api"
 import { TopNav } from "./top-nav"
 import { Sidebar } from "./sidebar"
 import { CommandPalette } from "@/components/search/command-palette"
@@ -16,8 +17,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoggedIn()) {
       router.replace("/login")
-    } else {
-      setReady(true)
+      return
+    }
+    setReady(true)
+    if (isTokenExpiringSoon()) {
+      auth.refresh().then(({ token }) => setToken(token)).catch(() => {})
     }
   }, [router])
 

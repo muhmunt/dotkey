@@ -98,6 +98,16 @@ func (h *Handler) Me(c *gin.Context) {
 	c.JSON(http.StatusOK, CurrentUser(c))
 }
 
+// Refresh issues a new 24h JWT for the currently authenticated user.
+func (h *Handler) Refresh(c *gin.Context) {
+	token, err := h.svc.GenerateToken(CurrentUser(c).ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to refresh token"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
 // ── 2FA management ────────────────────────────────────────────────────────────
 
 // Setup2FA generates a TOTP secret and returns a QR code URL.

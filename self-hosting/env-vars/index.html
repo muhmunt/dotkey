@@ -763,6 +763,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dashboard-build-time-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard build-time variables
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1635,6 +1646,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dashboard-build-time-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard build-time variables
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1716,10 +1738,33 @@
 </tr>
 </tbody>
 </table>
+<h2 id="dashboard-build-time-variables">Dashboard build-time variables<a class="headerlink" href="#dashboard-build-time-variables" title="Permanent link">&para;</a></h2>
+<p>The Next.js dashboard has one additional variable that must be set <strong>before building the image</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NEXT_PUBLIC_API_URL</code></td>
+<td><code>http://localhost:8080</code></td>
+<td>Public URL of the API, baked into the dashboard bundle at build time</td>
+</tr>
+</tbody>
+</table>
+<p>Pass it as a Docker build arg:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>build<span class="w"> </span>--build-arg<span class="w"> </span><span class="nv">NEXT_PUBLIC_API_URL</span><span class="o">=</span>https://api.example.com<span class="w"> </span>-t<span class="w"> </span>dotkey-web<span class="w"> </span>./web
+</code></pre></div>
+<p>When using Docker Compose, set it under <code>build.args</code> in <code>docker-compose.yml</code> (already configured by default) — updating it in <code>.env</code> and rebuilding is sufficient.</p>
 <div class="admonition warning">
 <p class="admonition-title">Secret rotation</p>
 <p>Changing <code>ENCRYPTION_KEY</code> will make all existing secrets unreadable.
-Changing <code>JWT_SECRET</code> will invalidate all active sessions.</p>
+Changing <code>JWT_SECRET</code> will invalidate all active sessions.
+Changing <code>NEXT_PUBLIC_API_URL</code> requires rebuilding the <code>web</code> image.</p>
 </div>
 
 

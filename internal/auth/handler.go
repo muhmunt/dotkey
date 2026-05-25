@@ -144,20 +144,30 @@ func (h *Handler) ForgotPassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "valid email is required"})
 		return
 	}
-	h.svc.RequestPasswordReset(input.Email) //nolint:errcheck — always silent
-	c.JSON(http.StatusOK, gin.H{"message": "if that email exists, a reset link has been sent"})
+	stateToken, err := h.svc.RequestPasswordReset(input.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+	// Always 200 — callers cannot tell whether the email exists
+	if stateToken != "" {
+		c.JSON(http.StatusOK, gin.H{"state_token": stateToken})
+	} else {
+		c.JSON(http.StatusOK, gin.H{})
+	}
 }
 
 func (h *Handler) ResetPassword(c *gin.Context) {
 	var input struct {
-		Token       string `json:"token" binding:"required"`
+		StateToken  string `json:"state_token" binding:"required"`
+		Code        string `json:"code" binding:"required"`
 		NewPassword string `json:"new_password" binding:"required,min=8"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := h.svc.ResetPassword(input.Token, input.NewPassword); err != nil {
+	if err := h.svc.ResetPassword(input.StateToken, input.Code, input.NewPassword); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rate limiting on auth endpoints — 10 requests per 15 minutes per IP (register, login, 2FA, reveal unlock, forgot/reset password)
 - Change display name inline in Settings
 - Change password from Settings with current-password verification
-- Forgot password / password reset flow — sends a 1-hour reset link via SMTP (gracefully disabled if `SMTP_HOST` is unset)
+- Forgot password / password reset flow — verifies identity via authenticator app (TOTP), no SMTP required
 - Delete account — requires password confirmation, blocks if sole owner of any project
 - Environment clone — copy all variables from one environment to another (one click in the sidebar)
 - Variable bulk delete — select multiple variables and delete in one action

@@ -19,9 +19,9 @@ All variables are set in the `.env` file at the repo root.
 | `DB_PASSWORD` | `dotkey` | Postgres password (Docker Compose only) |
 | `API_URL` | `http://localhost:8080` | API URL shown to the dashboard container |
 
-## SMTP (optional — enables password reset)
+## SMTP (optional — for future notifications)
 
-If `SMTP_HOST` is not set, the forgot-password endpoint returns an error and no email is sent. All other features work without SMTP.
+Password reset does **not** use email — it uses your authenticator app (TOTP). SMTP variables are reserved for future notification features and can be left unset.
 
 | Variable | Default | Description |
 |----------|---------|-------------|

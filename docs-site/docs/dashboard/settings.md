@@ -13,6 +13,19 @@ Hover over the **Name** row in the Account section and click the pencil icon. Ty
 3. Enter and confirm your new password (min. 8 characters)
 4. Click **Update password**
 
+## Forgot your password?
+
+Password reset uses your authenticator app — no email required.
+
+1. Click **Forgot password?** on the login page
+2. Enter your email address and click **Continue**
+3. Open your authenticator app and enter the 6-digit code
+4. Enter and confirm your new password
+5. Click **Reset password**
+
+!!! info "2FA required"
+    Password reset requires an active 2FA setup. If you have lost access to your authenticator app, contact your instance administrator to reset your account manually.
+
 ## Two-factor authentication
 
 See [2FA & Reveal Lock](2fa.md) for full details.

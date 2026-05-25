@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Mandatory 2FA onboarding — new users are redirected to `/setup-2fa` immediately after registration and cannot access the dashboard until setup is complete
+- JWT refresh tokens — sessions silently refresh when fewer than 1 hour remains, preventing unexpected logouts
+- JWT revocation blocklist — logout invalidates the token server-side (DB-backed JTI blocklist, expired entries purged every 10 min)
+- Load-more pagination on the Activity page (offset-based, 50 entries per page)
+- Load-more pagination on the History page (offset-based, 50 entries per page)
+
+### Fixed
+- Docker Compose `NEXT_PUBLIC_API_URL` now correctly passed as a build-time arg so custom API domains are baked into the dashboard bundle
+- Welcome page CLI install command and repository URLs updated to correct dotkey references
+
 ## [0.1.0] - 2026-05-22
 
 ### Added

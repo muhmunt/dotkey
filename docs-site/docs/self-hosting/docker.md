@@ -24,7 +24,21 @@ ENCRYPTION_KEY=$(openssl rand -hex 16)
 
 # Optional: restrict CORS to your domain
 ALLOWED_ORIGINS=https://app.example.com
+
+# Public URL of the API — baked into the dashboard at build time
+# Change this to your actual API domain when deploying behind a proxy
+NEXT_PUBLIC_API_URL=https://api.example.com
 ```
+
+!!! warning "NEXT_PUBLIC_API_URL is a build-time value"
+    The dashboard is a Next.js app that bakes `NEXT_PUBLIC_API_URL` into the
+    static bundle at `docker-compose build` time. If you change this variable
+    after the image is built, you must rebuild the `web` service:
+
+    ```bash
+    docker-compose build web
+    docker-compose up -d web
+    ```
 
 ## Start
 

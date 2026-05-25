@@ -5,13 +5,24 @@ dotkey has two layers of 2FA protection:
 1. **Login 2FA** — required every time you sign in
 2. **Reveal lock** — required every time you want to view secret values (15-minute session)
 
+!!! info "2FA is mandatory"
+    All accounts must have 2FA enabled. You are prompted to set it up immediately
+    after registering — the dashboard is not accessible until setup is complete.
+
 ## Setting up 2FA
 
+2FA is set up automatically during registration. You are redirected to the setup
+flow right after creating your account:
+
+1. Click **Set up 2FA** on the onboarding screen
+2. Scan the QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.)
+3. Enter the 6-digit code shown in your app to confirm
+4. 2FA is now enabled — you are taken to the dashboard
+
+If you ever disable 2FA and want to re-enable it:
+
 1. Go to **Settings → Two-Factor Authentication**
-2. Click **Set up 2FA**
-3. Scan the QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.)
-4. Enter the 6-digit code shown in your app to confirm
-5. 2FA is now enabled
+2. Click **Set up 2FA** and follow the same steps above
 
 ## Login with 2FA
 

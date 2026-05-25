@@ -19,6 +19,23 @@ All variables are set in the `.env` file at the repo root.
 | `DB_PASSWORD` | `dotkey` | Postgres password (Docker Compose only) |
 | `API_URL` | `http://localhost:8080` | API URL shown to the dashboard container |
 
+## Dashboard build-time variables
+
+The Next.js dashboard has one additional variable that must be set **before building the image**:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8080` | Public URL of the API, baked into the dashboard bundle at build time |
+
+Pass it as a Docker build arg:
+
+```bash
+docker build --build-arg NEXT_PUBLIC_API_URL=https://api.example.com -t dotkey-web ./web
+```
+
+When using Docker Compose, set it under `build.args` in `docker-compose.yml` (already configured by default) — updating it in `.env` and rebuilding is sufficient.
+
 !!! warning "Secret rotation"
     Changing `ENCRYPTION_KEY` will make all existing secrets unreadable.
     Changing `JWT_SECRET` will invalidate all active sessions.
+    Changing `NEXT_PUBLIC_API_URL` requires rebuilding the `web` image.

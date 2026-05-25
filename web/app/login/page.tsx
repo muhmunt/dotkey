@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { auth } from "@/lib/api"
-import { setToken } from "@/lib/auth"
+import { setToken, isLoggedIn } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,6 +13,11 @@ import { toast } from "sonner"
 
 export default function LoginPage() {
   const router = useRouter()
+
+  useEffect(() => {
+    if (isLoggedIn()) router.replace("/projects")
+  }, [router])
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)

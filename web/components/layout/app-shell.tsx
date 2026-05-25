@@ -10,10 +10,15 @@ import { ShortcutsModal } from "@/components/shortcuts-modal"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const [ready, setReady] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
 
   useEffect(() => {
-    if (!isLoggedIn()) router.replace("/login")
+    if (!isLoggedIn()) {
+      router.replace("/login")
+    } else {
+      setReady(true)
+    }
   }, [router])
 
   useEffect(() => {
@@ -28,6 +33,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [])
+
+  if (!ready) return null
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">

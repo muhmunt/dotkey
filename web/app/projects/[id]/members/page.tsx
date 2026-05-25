@@ -146,7 +146,7 @@ export default function MembersPage() {
           )}
 
           <p className="text-xs text-muted-foreground">
-            The user must already have an EnvX account.
+            The user must already have a dotkey account.
           </p>
         </div>
       )}

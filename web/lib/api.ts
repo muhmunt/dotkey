@@ -1,4 +1,4 @@
-import { getToken } from "./auth"
+import { getToken, clearToken } from "./auth"
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080"
 
@@ -12,6 +12,11 @@ async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
       ...init.headers,
     },
   })
+  if (res.status === 401) {
+    clearToken()
+    window.location.href = "/login"
+    throw new Error("Session expired. Please log in again.")
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new Error(body.error ?? `Request failed (${res.status})`)

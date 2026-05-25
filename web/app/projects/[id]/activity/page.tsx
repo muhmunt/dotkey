@@ -3,11 +3,14 @@
 import { useParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { activity, environments, history } from "@/lib/api"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { formatDate, shortId, cn } from "@/lib/utils"
 import { Activity, RotateCcw } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import type { ActivityEntry } from "@/lib/api"
+
+const PAGE_SIZE = 50
 
 const ACTION_STYLE: Record<string, string> = {
   created:     "text-emerald-400 bg-emerald-400/10",
@@ -39,16 +42,35 @@ export default function ActivityPage() {
   const qc = useQueryClient()
   const [envFilter, setEnvFilter] = useState("")
   const [actionFilter, setActionFilter] = useState("")
+  const [offset, setOffset] = useState(0)
+  const [allEntries, setAllEntries] = useState<ActivityEntry[]>([])
 
   const { data: envList = [] } = useQuery({
     queryKey: ["environments", projectId],
     queryFn: () => environments.list(projectId),
   })
 
-  const { data: entries = [], isLoading } = useQuery({
-    queryKey: ["activity", projectId, envFilter, actionFilter],
-    queryFn: () => activity.list(projectId, envFilter || undefined, actionFilter || undefined),
+  const { data: page = [], isLoading, isFetching } = useQuery({
+    queryKey: ["activity", projectId, envFilter, actionFilter, offset],
+    queryFn: () => activity.list(projectId, envFilter || undefined, actionFilter || undefined, offset, PAGE_SIZE),
   })
+
+  const hasMore = page.length === PAGE_SIZE
+
+  useEffect(() => {
+    if (offset === 0) {
+      setAllEntries(page)
+    } else {
+      setAllEntries(prev => [...prev, ...page])
+    }
+  }, [page, offset])
+
+  function resetFilters() {
+    setOffset(0)
+    setAllEntries([])
+  }
+
+  const entries = allEntries
 
   const rollback = useMutation({
     mutationFn: ({ envId, versionId }: { envId: string; versionId: string }) =>
@@ -75,7 +97,7 @@ export default function ActivityPage() {
       <div className="flex gap-2 mb-5 flex-wrap">
         <select
           value={envFilter}
-          onChange={e => setEnvFilter(e.target.value)}
+          onChange={e => { setEnvFilter(e.target.value); resetFilters() }}
           className="h-7 text-xs bg-input border border-border rounded px-2 text-foreground"
         >
           <option value="">All environments</option>
@@ -83,7 +105,7 @@ export default function ActivityPage() {
         </select>
         <select
           value={actionFilter}
-          onChange={e => setActionFilter(e.target.value)}
+          onChange={e => { setActionFilter(e.target.value); resetFilters() }}
           className="h-7 text-xs bg-input border border-border rounded px-2 text-foreground"
         >
           <option value="">All actions</option>
@@ -93,11 +115,12 @@ export default function ActivityPage() {
         </select>
       </div>
 
-      {isLoading && <p className="text-xs text-muted-foreground">Loading…</p>}
-
       {!isLoading && entries.length === 0 && (
         <p className="text-xs text-muted-foreground">No activity yet.</p>
       )}
+
+
+      {isLoading && offset === 0 && <p className="text-xs text-muted-foreground">Loading…</p>}
 
       {Object.entries(groups).map(([date, items]) => (
         <div key={date} className="mb-6">
@@ -156,6 +179,20 @@ export default function ActivityPage() {
           </div>
         </div>
       ))}
+
+      {hasMore && (
+        <div className="mt-2 flex justify-center">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-xs border-border"
+            onClick={() => setOffset(o => o + PAGE_SIZE)}
+            disabled={isFetching}
+          >
+            {isFetching ? "Loading…" : "Load more"}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

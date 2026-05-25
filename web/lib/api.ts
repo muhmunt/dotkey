@@ -117,8 +117,8 @@ export interface ActivityEntry {
 }
 
 export const activity = {
-  list: (projectId: string, envId?: string, action?: string, offset = 0) => {
-    const params = new URLSearchParams({ limit: "50", offset: String(offset) })
+  list: (projectId: string, envId?: string, action?: string, offset = 0, limit = 50) => {
+    const params = new URLSearchParams({ limit: String(limit), offset: String(offset) })
     if (envId) params.set("env", envId)
     if (action) params.set("action", action)
     return req<ActivityEntry[]>(`/api/v1/projects/${projectId}/activity?${params}`)

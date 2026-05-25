@@ -48,6 +48,7 @@ export const auth = {
     }),
   me: () => req<User>("/api/v1/auth/me"),
   refresh: () => req<{ token: string }>("/api/v1/auth/refresh", { method: "POST" }),
+  logout: () => req<void>("/api/v1/auth/logout", { method: "POST" }),
   deviceCode: () =>
     req<{ device_code: string; user_code: string; expires_in: number }>("/api/v1/auth/device", { method: "POST" }),
   deviceActivate: (user_code: string) =>
@@ -229,8 +230,8 @@ export const variables = {
 // ── History & Rollback ────────────────────────────────────────────────────────
 
 export const history = {
-  list: (projectId: string, envId: string) =>
-    req<VariableVersion[]>(`/api/v1/projects/${projectId}/environments/${envId}/history`),
+  list: (projectId: string, envId: string, offset = 0, limit = 50) =>
+    req<VariableVersion[]>(`/api/v1/projects/${projectId}/environments/${envId}/history?limit=${limit}&offset=${offset}`),
   rollback: (projectId: string, envId: string, versionId: string) =>
     req<{ message: string }>(`/api/v1/projects/${projectId}/environments/${envId}/rollback/${versionId}`, {
       method: "POST",

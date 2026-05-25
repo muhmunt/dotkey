@@ -30,6 +30,7 @@ func Init(cfg *config.Config) {
 		&models.VariableVersion{},
 		&models.DeviceCode{},
 		&models.ProjectToken{},
+		&models.RevokedToken{},
 	); err != nil {
 		log.Fatal("migration failed: ", err)
 	}

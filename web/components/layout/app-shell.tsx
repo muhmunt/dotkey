@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { isLoggedIn, isTokenExpiringSoon, setToken } from "@/lib/auth"
 import { auth } from "@/lib/api"
+import { useQuery } from "@tanstack/react-query"
 import { TopNav } from "./top-nav"
 import { Sidebar } from "./sidebar"
 import { CommandPalette } from "@/components/search/command-palette"
@@ -14,16 +15,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
 
+  const { data: user } = useQuery({
+    queryKey: ["me"],
+    queryFn: auth.me,
+    enabled: isLoggedIn(),
+    staleTime: 60_000,
+  })
+
   useEffect(() => {
     if (!isLoggedIn()) {
       router.replace("/login")
       return
     }
-    setReady(true)
     if (isTokenExpiringSoon()) {
       auth.refresh().then(({ token }) => setToken(token)).catch(() => {})
     }
-  }, [router])
+    if (user === undefined) return
+    if (!user.totp_enabled) {
+      router.replace("/setup-2fa")
+      return
+    }
+    setReady(true)
+  }, [user, router])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

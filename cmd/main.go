@@ -32,7 +32,9 @@ func main() {
 		ticker := time.NewTicker(10 * time.Minute)
 		defer ticker.Stop()
 		for range ticker.C {
-			db.DB.Where("expires_at < ?", time.Now()).Delete(&models.DeviceCode{})
+			now := time.Now()
+			db.DB.Where("expires_at < ?", now).Delete(&models.DeviceCode{})
+			db.DB.Where("expires_at < ?", now).Delete(&models.RevokedToken{})
 		}
 	}()
 

@@ -98,6 +98,12 @@ func (h *Handler) Me(c *gin.Context) {
 	c.JSON(http.StatusOK, CurrentUser(c))
 }
 
+func (h *Handler) Logout(c *gin.Context) {
+	token := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+	h.svc.Revoke(token) //nolint:errcheck — best-effort revocation
+	c.JSON(http.StatusOK, gin.H{"message": "logged out"})
+}
+
 // Refresh issues a new 24h JWT for the currently authenticated user.
 func (h *Handler) Refresh(c *gin.Context) {
 	token, err := h.svc.GenerateToken(CurrentUser(c).ID)

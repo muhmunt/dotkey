@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/pquerna/otp/totp"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -29,6 +30,21 @@ func NewService(cfg *config.Config, c *crypto.Crypto) *Service {
 type Claims struct {
 	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
+}
+
+func (s *Service) Revoke(tokenStr string) error {
+	claims, err := s.ValidateToken(tokenStr)
+	if err != nil {
+		return nil // already invalid, nothing to revoke
+	}
+	jti := claims.ID
+	if jti == "" {
+		return nil
+	}
+	return db.DB.Create(&models.RevokedToken{
+		JTI:       jti,
+		ExpiresAt: claims.ExpiresAt.Time,
+	}).Error
 }
 
 // typedClaims are used for short-lived special-purpose tokens (state, reveal).
@@ -200,6 +216,7 @@ func (s *Service) GenerateToken(userID string) (string, error) {
 	claims := Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        uuid.New().String(),
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},

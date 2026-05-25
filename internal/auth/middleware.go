@@ -58,6 +58,15 @@ func (s *Service) Middleware() gin.HandlerFunc {
 			return
 		}
 
+		// check revocation blocklist
+		if claims.ID != "" {
+			var revoked models.RevokedToken
+			if db.DB.First(&revoked, "jti = ?", claims.ID).Error == nil {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token has been revoked"})
+				return
+			}
+		}
+
 		var user models.User
 		if err := db.DB.First(&user, "id = ?", claims.UserID).Error; err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "user not found"})

@@ -24,7 +24,7 @@ export default function WelcomePage() {
 
   function finish(projectId?: string) {
     if (typeof window !== "undefined") {
-      localStorage.setItem("envx_welcomed", "1")
+      localStorage.setItem("dotkey_welcomed", "1")
     }
     router.push(projectId ? `/projects/${projectId}` : "/projects")
   }
@@ -185,10 +185,10 @@ function SlideCLI({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }
 
       <div className="space-y-3 mb-8">
         <p className="text-xs text-muted-foreground uppercase tracking-wider">macOS / Linux</p>
-        <CodeBlock code="curl -fsSL install.envx.io | sh" />
+        <CodeBlock code="curl -fsSL https://raw.githubusercontent.com/muhmunt/dotkey-cli/main/install.sh | sh" />
 
         <p className="text-xs text-muted-foreground uppercase tracking-wider pt-2">Build from source</p>
-        <CodeBlock code="go install github.com/envx/cli@latest" />
+        <CodeBlock code="go install github.com/muhmunt/dotkey-cli@latest" />
       </div>
 
       <div className="flex gap-3">

@@ -4,6 +4,7 @@ import (
 	"dotkey/db"
 	"dotkey/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,7 +29,15 @@ func (h *Handler) History(c *gin.Context) {
 		return
 	}
 
-	versions, err := h.repo.FindByEnvironment(c.Param("eid"))
+	limit, offset := 50, 0
+	if v, err := strconv.Atoi(c.Query("limit")); err == nil && v > 0 {
+		limit = v
+	}
+	if v, err := strconv.Atoi(c.Query("offset")); err == nil && v >= 0 {
+		offset = v
+	}
+
+	versions, err := h.repo.FindByEnvironment(c.Param("eid"), limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

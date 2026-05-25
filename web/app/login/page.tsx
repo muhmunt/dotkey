@@ -37,7 +37,8 @@ export default function LoginPage() {
         setNeeds2FA(true)
       } else {
         setToken(result.token)
-        router.push("/projects")
+        const me = await auth.me()
+        router.push(me.totp_enabled ? "/projects" : "/setup-2fa")
       }
     } catch (err: any) {
       toast.error(err.message)
@@ -52,7 +53,7 @@ export default function LoginPage() {
     try {
       const { token } = await auth.login2fa(stateToken, totpCode)
       setToken(token)
-      router.push("/projects")
+      router.push("/projects") // 2FA login means totp_enabled is true
     } catch (err: any) {
       toast.error(err.message)
       setTotpCode("")

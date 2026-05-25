@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useEffect } from "react"
 import { environments, history } from "@/lib/api"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -17,18 +18,38 @@ const actionColor: Record<string, string> = {
   rolled_back: "text-blue-400",
 }
 
+const PAGE_SIZE = 50
+
 export default function HistoryPage() {
   const { id: projectId } = useParams<{ id: string }>()
   const qc = useQueryClient()
 
   const { data: envList = [] } = useQuery({ queryKey: ["environments", projectId], queryFn: () => environments.list(projectId) })
   const [selectedEnv, setSelectedEnv] = useState<Environment | null>(null)
+  const [offset, setOffset] = useState(0)
+  const [allVersions, setAllVersions] = useState<any[]>([])
 
-  const { data: versions = [], isLoading } = useQuery({
-    queryKey: ["history", projectId, selectedEnv?.id],
-    queryFn: () => history.list(projectId, selectedEnv!.id),
+  const { data: page = [], isLoading, isFetching } = useQuery({
+    queryKey: ["history", projectId, selectedEnv?.id, offset],
+    queryFn: () => history.list(projectId, selectedEnv!.id, offset, PAGE_SIZE),
     enabled: !!selectedEnv,
   })
+
+  const versions = offset === 0 ? page : allVersions
+  const hasMore = page.length === PAGE_SIZE
+
+  // accumulate pages
+  useEffect(() => {
+    if (offset === 0) {
+      setAllVersions(page)
+    } else {
+      setAllVersions(prev => [...prev, ...page])
+    }
+  }, [page, offset])
+
+  function loadMore() {
+    setOffset(o => o + PAGE_SIZE)
+  }
 
   const rollback = useMutation({
     mutationFn: (versionId: string) => history.rollback(projectId, selectedEnv!.id, versionId),
@@ -53,6 +74,8 @@ export default function HistoryPage() {
           onChange={e => {
             const env = envList.find(ev => ev.id === e.target.value) ?? null
             setSelectedEnv(env)
+            setOffset(0)
+            setAllVersions([])
           }}
           className="h-8 text-xs bg-input border border-border rounded-md px-2 text-foreground"
         >
@@ -103,6 +126,20 @@ export default function HistoryPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="mt-4 flex justify-center">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-xs border-border"
+            onClick={loadMore}
+            disabled={isFetching}
+          >
+            {isFetching ? "Loading…" : "Load more"}
+          </Button>
         </div>
       )}
     </div>

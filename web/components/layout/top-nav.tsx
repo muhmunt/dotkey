@@ -14,7 +14,8 @@ export function TopNav({ onShortcuts }: { onShortcuts?: () => void }) {
   const router = useRouter()
   const { data: user } = useQuery({ queryKey: ["me"], queryFn: auth.me, retry: false })
 
-  function logout() {
+  async function logout() {
+    await auth.logout().catch(() => {}) // revoke on server; ignore errors
     clearToken()
     router.push("/login")
   }

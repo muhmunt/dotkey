@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { auth } from "@/lib/api"
 import { isLoggedIn } from "@/lib/auth"
@@ -15,6 +15,8 @@ type Step = "intro" | "scan" | "confirm"
 
 export default function Setup2FAPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isOnboarding = searchParams.get("onboarding") === "true"
   const [step, setStep] = useState<Step>("intro")
   const [qrURL, setQrURL] = useState("")
   const [code, setCode] = useState("")
@@ -32,7 +34,7 @@ export default function Setup2FAPage() {
       return
     }
     if (user?.totp_enabled) {
-      router.replace("/projects")
+      router.replace(isOnboarding ? "/welcome" : "/projects")
     }
   }, [user, router])
 
@@ -55,7 +57,7 @@ export default function Setup2FAPage() {
     try {
       await auth.confirm2fa(code)
       toast.success("2FA enabled — your account is now protected")
-      router.replace("/projects")
+      router.replace(isOnboarding ? "/welcome" : "/projects")
     } catch (err: any) {
       toast.error(err.message)
       setCode("")

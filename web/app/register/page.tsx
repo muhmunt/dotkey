@@ -29,7 +29,7 @@ export default function RegisterPage() {
     try {
       const { token } = await auth.register(name, email, password)
       setToken(token)
-      router.push("/setup-2fa")
+      router.push("/setup-2fa?onboarding=true")
     } catch (err: any) {
       toast.error(err.message)
     } finally {

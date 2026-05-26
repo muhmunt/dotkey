@@ -42,6 +42,7 @@ nav:
   - Self-Hosting:
       - Docker Compose: self-hosting/docker.md
       - Environment Variables: self-hosting/env-vars.md
+      - .env Encryption: self-hosting/env-encryption.md
   - Dashboard:
       - Projects: dashboard/projects.md
       - Environments: dashboard/environments.md

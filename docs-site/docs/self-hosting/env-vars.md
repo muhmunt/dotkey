@@ -2,45 +2,10 @@
 
 All variables are set in the `.env` file at the repo root.
 
-## Encrypting your .env (recommended for production)
-
-dotkey supports **Pattern A** value-level encryption — sensitive values are encrypted in-place while non-secret values (`PORT`, `ALLOWED_ORIGINS`) stay readable.
-
-```bash
-# 1. Build the encryption tool
-go build -o dotkey-enc ./tools/envenc
-
-# 2. Generate a master key (keep this secret — never put it in .env)
-./dotkey-enc keygen
-# → DOTKEY_MASTER_KEY=499601be72f5...
-
-# 3. Export the master key in your shell
-export DOTKEY_MASTER_KEY=499601be72f5...
-
-# 4. Encrypt the sensitive values in your .env
-./dotkey-enc encrypt .env
-# → JWT_SECRET=encrypted:v1:KaQP...:og_E...
-# → ENCRYPTION_KEY=encrypted:v1:lV7A...:J6rL...
-# → DATABASE_URL=encrypted:v1:HciG...:hyrF...
-
-# 5. Preview decrypted values at any time (does not modify the file)
-./dotkey-enc decrypt .env
-
-# 6. Encrypt specific keys only
-./dotkey-enc encrypt .env JWT_SECRET ENCRYPTION_KEY
-```
-
-At server startup, set `DOTKEY_MASTER_KEY` in the environment (Docker secret, systemd credential, shell) — the server automatically decrypts any `encrypted:v1:…` values before reading the config.
-
-```bash
-DOTKEY_MASTER_KEY=<key> ./dotkey-api
-```
-
-!!! warning "Never store DOTKEY_MASTER_KEY in .env"
-    The master key must come from outside the `.env` file — a Docker secret,
-    a `systemd` `EnvironmentFile` with restricted permissions, or an operator's
-    shell. If the master key and the encrypted `.env` are in the same place,
-    encryption provides no protection.
+!!! tip "Encrypt your .env in production"
+    Sensitive values (`JWT_SECRET`, `ENCRYPTION_KEY`, `DATABASE_URL`) can be
+    encrypted in-place so a leaked `.env` file is useless without the master key.
+    See [.env Encryption](env-encryption.md) for the full guide.
 
 ## Required
 
@@ -88,7 +53,15 @@ docker build --build-arg NEXT_PUBLIC_API_URL=https://api.example.com -t dotkey-w
 
 When using Docker Compose, set it under `build.args` in `docker-compose.yml` (already configured by default) — updating it in `.env` and rebuilding is sufficient.
 
-!!! warning "Secret rotation"
-    Changing `ENCRYPTION_KEY` will make all existing secrets unreadable.
-    Changing `JWT_SECRET` will invalidate all active sessions.
-    Changing `NEXT_PUBLIC_API_URL` requires rebuilding the `web` image.
+## Secret rotation { #secret-rotation }
+
+| Secret | Effect of changing | Migration path |
+|--------|--------------------|----------------|
+| `ENCRYPTION_KEY` | All stored variable values become **permanently unreadable** | Re-export all variables before changing, re-import after |
+| `JWT_SECRET` | All active user sessions are **immediately invalidated** | Users must log in again; safe to rotate at any time |
+| `NEXT_PUBLIC_API_URL` | No effect until the `web` image is rebuilt | `docker-compose build web && docker-compose up -d web` |
+| `DOTKEY_MASTER_KEY` | Encrypted `.env` cannot be read by the server | See [key rotation](env-encryption.md#key-rotation) |
+
+!!! danger
+    There is no migration tool for `ENCRYPTION_KEY` rotation. Export all environment
+    variables to plaintext before changing the key, then re-import after.

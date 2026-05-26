@@ -8,6 +8,14 @@ Every variable value is encrypted with **AES-256-GCM** before being written to t
 - The same plaintext encrypted twice produces different ciphertexts
 - Without the `ENCRYPTION_KEY`, the database contains only unreadable ciphertext
 
+## .env file encryption
+
+The server's own `.env` file (which contains `ENCRYPTION_KEY`, `JWT_SECRET`, `DATABASE_URL`) can be encrypted at rest using the `dotkey-enc` tool. Sensitive values are replaced with `encrypted:v1:…` blobs; the server decrypts them in memory at startup using `DOTKEY_MASTER_KEY`, which is never stored in the `.env` file itself.
+
+See [.env Encryption](self-hosting/env-encryption.md) for the full guide.
+
+The CLI auth token stored in `~/.dotkey/config.yaml` is also encrypted at rest using a per-machine key (`~/.dotkey/key`, mode 0600).
+
 ## Passwords
 
 User passwords are hashed with **bcrypt** (cost factor 10). The plaintext password is never stored or logged.

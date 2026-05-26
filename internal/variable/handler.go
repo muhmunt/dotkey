@@ -1,6 +1,8 @@
 package variable
 
 import (
+	"dotkey/internal/audit"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -68,11 +70,13 @@ func (h *Handler) Delete(c *gin.Context) {
 
 // Export returns raw KEY=VALUE content for CLI pull.
 func (h *Handler) Export(c *gin.Context) {
-	content, err := h.svc.Export(c.Param("id"), c.Param("eid"), c.GetString("user_id"))
+	projectID, envID, userID := c.Param("id"), c.Param("eid"), c.GetString("user_id")
+	content, err := h.svc.Export(projectID, envID, userID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
+	audit.Log(userID, "export", c.ClientIP(), fmt.Sprintf("project:%s env:%s", projectID, envID))
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusOK, content)
 }

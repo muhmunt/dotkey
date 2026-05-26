@@ -3,6 +3,7 @@ package auth
 import (
 	"crypto/rand"
 	"dotkey/db"
+	"dotkey/internal/audit"
 	"dotkey/models"
 	"net/http"
 	"strings"
@@ -58,6 +59,7 @@ func (h *Handler) Login(c *gin.Context) {
 
 	result, err := h.svc.Login(input.Email, input.Password)
 	if err != nil {
+		audit.Log("", "login.failed", c.ClientIP(), "email: "+input.Email)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
@@ -70,6 +72,7 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
+	audit.Log("", "login.success", c.ClientIP(), "email: "+input.Email)
 	c.JSON(http.StatusOK, gin.H{"token": result.Token})
 }
 
@@ -91,6 +94,7 @@ func (h *Handler) Login2FA(c *gin.Context) {
 		return
 	}
 
+	audit.Log("", "login.success.2fa", c.ClientIP(), "")
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
@@ -123,10 +127,12 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := h.svc.ChangePassword(CurrentUser(c).ID, input.CurrentPassword, input.NewPassword); err != nil {
+	user := CurrentUser(c)
+	if err := h.svc.ChangePassword(user.ID, input.CurrentPassword, input.NewPassword); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	audit.Log(user.ID, "password.changed", c.ClientIP(), "")
 	c.JSON(http.StatusOK, gin.H{"message": "password updated"})
 }
 
@@ -144,22 +150,19 @@ func (h *Handler) ForgotPassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "valid email is required"})
 		return
 	}
-	stateToken, err := h.svc.RequestPasswordReset(input.Email)
+	requestID, err := h.svc.RequestPasswordReset(input.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
 		return
 	}
-	// Always 200 — callers cannot tell whether the email exists
-	if stateToken != "" {
-		c.JSON(http.StatusOK, gin.H{"state_token": stateToken})
-	} else {
-		c.JSON(http.StatusOK, gin.H{})
-	}
+	// Always identical response — callers cannot tell whether the email exists.
+	// request_id is empty string when not found; frontend shows the same message either way.
+	c.JSON(http.StatusOK, gin.H{"request_id": requestID})
 }
 
 func (h *Handler) ResetPassword(c *gin.Context) {
 	var input struct {
-		StateToken  string `json:"state_token" binding:"required"`
+		RequestID   string `json:"request_id" binding:"required"`
 		Code        string `json:"code" binding:"required"`
 		NewPassword string `json:"new_password" binding:"required,min=8"`
 	}
@@ -167,7 +170,7 @@ func (h *Handler) ResetPassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := h.svc.ResetPassword(input.StateToken, input.Code, input.NewPassword); err != nil {
+	if err := h.svc.ResetPassword(input.RequestID, input.Code, input.NewPassword); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -218,7 +221,7 @@ func (h *Handler) Setup2FA(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"qr_url": qrURL})
 }
 
-// Confirm2FA validates the first scan and enables 2FA on the account.
+// Confirm2FA validates the first scan, enables 2FA, and returns 8 backup codes.
 func (h *Handler) Confirm2FA(c *gin.Context) {
 	var input struct {
 		Code string `json:"code" binding:"required"`
@@ -228,12 +231,63 @@ func (h *Handler) Confirm2FA(c *gin.Context) {
 		return
 	}
 
-	if err := h.svc.ConfirmTOTP(CurrentUser(c).ID, input.Code); err != nil {
+	user := CurrentUser(c)
+	codes, err := h.svc.ConfirmTOTP(user.ID, input.Code)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "2FA enabled"})
+	audit.Log(user.ID, "2fa.enabled", c.ClientIP(), "")
+	c.JSON(http.StatusOK, gin.H{
+		"message":      "2FA enabled",
+		"backup_codes": codes,
+	})
+}
+
+// BackupCodeCount returns how many unused backup codes remain.
+func (h *Handler) BackupCodeCount(c *gin.Context) {
+	count, err := h.svc.BackupCodeCount(CurrentUser(c).ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"remaining": count})
+}
+
+// RegenerateBackupCodes replaces all backup codes. Requires TOTP confirmation.
+func (h *Handler) RegenerateBackupCodes(c *gin.Context) {
+	var input struct {
+		Code string `json:"code" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	codes, err := h.svc.RegenerateBackupCodes(CurrentUser(c).ID, input.Code)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"backup_codes": codes})
+}
+
+// LoginBackupCode completes login using a one-time backup code instead of TOTP.
+func (h *Handler) LoginBackupCode(c *gin.Context) {
+	var input struct {
+		StateToken string `json:"state_token" binding:"required"`
+		BackupCode string `json:"backup_code" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	token, err := h.svc.LoginWithBackupCode(input.StateToken, input.BackupCode)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
 // Disable2FA requires the current TOTP code before removing 2FA.
@@ -246,11 +300,13 @@ func (h *Handler) Disable2FA(c *gin.Context) {
 		return
 	}
 
-	if err := h.svc.DisableTOTP(CurrentUser(c).ID, input.Code); err != nil {
+	user := CurrentUser(c)
+	if err := h.svc.DisableTOTP(user.ID, input.Code); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	audit.Log(user.ID, "2fa.disabled", c.ClientIP(), "")
 	c.JSON(http.StatusOK, gin.H{"message": "2FA disabled"})
 }
 
@@ -274,6 +330,26 @@ func (h *Handler) RevealUnlock(c *gin.Context) {
 		"reveal_token": revealToken,
 		"expires_in":   900, // 15 minutes
 	})
+}
+
+// AuditLog returns the security event log for the current user.
+func (h *Handler) AuditLog(c *gin.Context) {
+	userID := CurrentUser(c).ID
+	var logs []struct {
+		ID        string `json:"id"`
+		Action    string `json:"action"`
+		IP        string `json:"ip"`
+		Detail    string `json:"detail"`
+		CreatedAt string `json:"created_at"`
+	}
+	db.DB.Raw(`
+		SELECT id, action, ip, detail, created_at
+		FROM audit_logs
+		WHERE user_id = ?
+		ORDER BY created_at DESC
+		LIMIT 100
+	`, userID).Scan(&logs)
+	c.JSON(http.StatusOK, logs)
 }
 
 // ── Device flow ───────────────────────────────────────────────────────────────

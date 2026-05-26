@@ -65,7 +65,7 @@ func main() {
 	varSvc := variable.NewService(varRepo, envSvc, projectSvc, cryptoSvc)
 	envSvc.SetVariableCopier(varSvc)
 	webhookRepo := webhook.NewRepository()
-	webhookSvc := webhook.NewService(webhookRepo, projectSvc)
+	webhookSvc := webhook.NewService(webhookRepo, projectSvc, cryptoSvc)
 	varSvc.SetWebhookDeliverer(webhookSvc)
 	tokenSvc := tkn.NewService(tokenRepo, projectSvc)
 
@@ -82,6 +82,16 @@ func main() {
 
 	allowedOrigins := buildOriginSet(cfg.AllowedOrigins)
 	engine.Use(func(c *gin.Context) {
+		// Security headers
+		c.Header("X-Content-Type-Options", "nosniff")
+		c.Header("X-Frame-Options", "DENY")
+		c.Header("X-XSS-Protection", "1; mode=block")
+		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
+		c.Header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+		// API-only server — no HTML, fonts, or media served
+		c.Header("Content-Security-Policy", "default-src 'none'")
+
+		// CORS
 		origin := c.GetHeader("Origin")
 		if _, ok := allowedOrigins[origin]; ok {
 			c.Header("Access-Control-Allow-Origin", origin)

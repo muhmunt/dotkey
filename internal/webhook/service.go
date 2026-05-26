@@ -5,12 +5,16 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
+	"dotkey/db"
 	"dotkey/models"
+	"dotkey/pkg/crypto"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -22,10 +26,11 @@ type ProjectAccess interface {
 type Service struct {
 	repo    *Repository
 	projSvc ProjectAccess
+	crypto  *crypto.Crypto
 }
 
-func NewService(repo *Repository, projSvc ProjectAccess) *Service {
-	return &Service{repo: repo, projSvc: projSvc}
+func NewService(repo *Repository, projSvc ProjectAccess, c *crypto.Crypto) *Service {
+	return &Service{repo: repo, projSvc: projSvc, crypto: c}
 }
 
 type WebhookResponse struct {
@@ -35,6 +40,7 @@ type WebhookResponse struct {
 	Events    []string  `json:"events"`
 	Active    bool      `json:"active"`
 	CreatedAt time.Time `json:"created_at"`
+	Secret    string    `json:"secret,omitempty"` // returned once at creation only
 }
 
 func toResponse(w models.Webhook) WebhookResponse {
@@ -60,7 +66,7 @@ func (s *Service) List(projectID, userID string) ([]WebhookResponse, error) {
 	return out, nil
 }
 
-func (s *Service) Create(projectID, userID, url string, events []string) (*WebhookResponse, error) {
+func (s *Service) Create(projectID, userID, rawURL string, events []string) (*WebhookResponse, error) {
 	role, err := s.projSvc.GetMemberRole(projectID, userID)
 	if err != nil {
 		return nil, errors.New("project not found")
@@ -68,14 +74,23 @@ func (s *Service) Create(projectID, userID, url string, events []string) (*Webho
 	if role != "owner" && role != "admin" {
 		return nil, errors.New("insufficient permissions")
 	}
+	if err := validateWebhookURL(rawURL); err != nil {
+		return nil, err
+	}
+
 	secretBytes := make([]byte, 24)
 	rand.Read(secretBytes) //nolint:errcheck
-	secret := hex.EncodeToString(secretBytes)
+	plainSecret := hex.EncodeToString(secretBytes)
+
+	encryptedSecret, err := s.crypto.Encrypt(plainSecret)
+	if err != nil {
+		return nil, errors.New("failed to secure webhook secret")
+	}
 
 	w := &models.Webhook{
 		ProjectID: projectID,
-		URL:       url,
-		Secret:    secret,
+		URL:       rawURL,
+		Secret:    encryptedSecret,
 		Events:    strings.Join(events, ","),
 		Active:    true,
 	}
@@ -83,7 +98,21 @@ func (s *Service) Create(projectID, userID, url string, events []string) (*Webho
 		return nil, err
 	}
 	r := toResponse(*w)
+	// return the plaintext secret once so the user can save it
+	r.Secret = plainSecret
 	return &r, nil
+}
+
+func (s *Service) Deliveries(projectID, webhookID, userID string) ([]models.WebhookDelivery, error) {
+	if _, err := s.projSvc.GetMemberRole(projectID, userID); err != nil {
+		return nil, errors.New("project not found")
+	}
+	var deliveries []models.WebhookDelivery
+	err := db.DB.Where("webhook_id = ?", webhookID).
+		Order("delivered_at desc").
+		Limit(25).
+		Find(&deliveries).Error
+	return deliveries, err
 }
 
 func (s *Service) Delete(projectID, webhookID, userID string) error {
@@ -129,17 +158,22 @@ func (s *Service) Deliver(projectID, envID, envName, key, event, actor string) {
 		if !strings.Contains(h.Events, event) {
 			continue
 		}
-		go deliverOne(h.URL, h.Secret, body)
+		plainSecret, err := s.crypto.Decrypt(h.Secret)
+		if err != nil {
+			continue // skip hooks with corrupted/legacy secrets
+		}
+		go deliverOne(h.ID, h.URL, plainSecret, event, body)
 	}
 }
 
-func deliverOne(url, secret string, body []byte) {
-	mac := hmac.New(sha256.New, []byte(secret))
+func deliverOne(webhookID, targetURL, plainSecret, event string, body []byte) {
+	mac := hmac.New(sha256.New, []byte(plainSecret))
 	mac.Write(body)
 	sig := fmt.Sprintf("sha256=%s", hex.EncodeToString(mac.Sum(nil)))
 
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
+	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewReader(body))
 	if err != nil {
+		recordDelivery(webhookID, event, 0, err.Error())
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -147,7 +181,47 @@ func deliverOne(url, secret string, body []byte) {
 
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
-	if err == nil {
-		resp.Body.Close()
+	if err != nil {
+		recordDelivery(webhookID, event, 0, err.Error())
+		return
 	}
+	resp.Body.Close()
+	recordDelivery(webhookID, event, resp.StatusCode, "")
+}
+
+func recordDelivery(webhookID, event string, status int, errMsg string) {
+	db.DB.Create(&models.WebhookDelivery{
+		WebhookID:      webhookID,
+		Event:          event,
+		ResponseStatus: status,
+		Error:          errMsg,
+		DeliveredAt:    time.Now(),
+	})
+}
+
+// validateWebhookURL rejects non-HTTP(S) schemes and private/loopback IP ranges (SSRF protection).
+func validateWebhookURL(rawURL string) error {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return errors.New("invalid webhook URL")
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return errors.New("webhook URL must use http or https")
+	}
+	host := u.Hostname()
+	ips, err := net.LookupHost(host)
+	if err != nil {
+		// allow if DNS fails at validation time — block at delivery if needed
+		return nil
+	}
+	for _, ipStr := range ips {
+		ip := net.ParseIP(ipStr)
+		if ip == nil {
+			continue
+		}
+		if ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsUnspecified() {
+			return errors.New("webhook URL must point to a public endpoint, not a private/loopback address")
+		}
+	}
+	return nil
 }

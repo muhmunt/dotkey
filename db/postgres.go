@@ -33,6 +33,9 @@ func Init(cfg *config.Config) {
 		&models.RevokedToken{},
 		&models.PasswordResetToken{},
 		&models.Webhook{},
+		&models.BackupCode{},
+		&models.WebhookDelivery{},
+		&models.AuditLog{},
 	); err != nil {
 		log.Fatal("migration failed: ", err)
 	}

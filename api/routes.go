@@ -65,6 +65,7 @@ func (r *Router) Setup(engine *gin.Engine) {
 		authGroup.POST("/register", authRL, r.authH.Register)
 		authGroup.POST("/login", authRL, r.authH.Login)
 		authGroup.POST("/login/2fa", authRL, r.authH.Login2FA)
+		authGroup.POST("/login/backup-code", authRL, r.authH.LoginBackupCode)
 		authGroup.POST("/forgot-password", authRL, r.authH.ForgotPassword)
 		authGroup.POST("/reset-password", authRL, r.authH.ResetPassword)
 		authGroup.POST("/device", r.authH.DeviceCode)
@@ -81,12 +82,15 @@ func (r *Router) Setup(engine *gin.Engine) {
 		protected.POST("/auth/2fa/setup", r.authH.Setup2FA)
 		protected.POST("/auth/2fa/confirm", r.authH.Confirm2FA)
 		protected.DELETE("/auth/2fa", r.authH.Disable2FA)
+		protected.GET("/auth/2fa/backup-codes/count", r.authH.BackupCodeCount)
+		protected.POST("/auth/2fa/backup-codes/regenerate", authRL, r.authH.RegenerateBackupCodes)
+		protected.GET("/auth/audit-log", r.authH.AuditLog)
 		protected.POST("/auth/reveal/unlock", authRL, r.authH.RevealUnlock)
 		protected.PUT("/auth/me", r.authH.UpdateMe)
 		protected.POST("/auth/change-password", r.authH.ChangePassword)
 		protected.DELETE("/auth/me", r.authH.DeleteMe)
 
-		protected.GET("/users/search", user.Search)
+		protected.GET("/users/search", ratelimit.Login(10, time.Minute), user.Search)
 		protected.GET("/search", search.Search) // global search
 
 		projects := protected.Group("/projects")
@@ -118,6 +122,7 @@ func (r *Router) Setup(engine *gin.Engine) {
 			projects.GET("/:id/webhooks", r.webhookH.List)
 			projects.POST("/:id/webhooks", r.webhookH.Create)
 			projects.DELETE("/:id/webhooks/:wid", r.webhookH.Delete)
+			projects.GET("/:id/webhooks/:wid/deliveries", r.webhookH.Deliveries)
 
 			envVars := projects.Group("/:id/environments/:eid")
 			{

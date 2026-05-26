@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>("email")
   const [email, setEmail] = useState("")
-  const [stateToken, setStateToken] = useState("")
+  const [requestId, setRequestId] = useState("")
   const [code, setCode] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -36,13 +36,11 @@ export default function ForgotPasswordPage() {
     setLoading(true)
     try {
       const res = await auth.forgotPassword(email)
-      if (res.state_token) {
-        setStateToken(res.state_token)
-        setStep("verify")
-      } else {
-        // No account / 2FA not set up — show generic message to prevent enumeration
-        setErrors({ email: "No account with 2FA found for that email. Set up 2FA before resetting your password." })
-      }
+      // Always advance to verify step — show the same screen whether or not
+      // the email exists (prevents enumeration). If request_id is empty the
+      // reset step will fail with "session expired" which is fine.
+      setRequestId(res.request_id ?? "")
+      setStep("verify")
     } catch {
       setErrors({ email: "Something went wrong. Please try again." })
     } finally {
@@ -60,7 +58,7 @@ export default function ForgotPasswordPage() {
     setErrors({})
     setLoading(true)
     try {
-      await auth.resetPassword(stateToken, code, newPassword)
+      await auth.resetPassword(requestId, code, newPassword)
       router.push("/login?reset=1")
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Reset failed"

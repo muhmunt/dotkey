@@ -1,6 +1,7 @@
 package auth
 
 import (
+	crand "crypto/rand"
 	"dotkey/config"
 	"dotkey/db"
 	"dotkey/models"
@@ -8,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -18,8 +20,9 @@ import (
 )
 
 type Service struct {
-	cfg    *config.Config
-	crypto *crypto.Crypto
+	cfg         *config.Config
+	crypto      *crypto.Crypto
+	resetTokens sync.Map // requestID -> stateToken (in-memory, 15-min TTL via JWT expiry)
 }
 
 func NewService(cfg *config.Config, c *crypto.Crypto) *Service {
@@ -65,10 +68,10 @@ type LoginResult struct {
 
 // ── Password reset (2FA-based) ────────────────────────────────────────────────
 
-// RequestPasswordReset returns a short-lived state token if the email belongs
-// to a 2FA-enabled account. Returns ("", nil) silently if not found or 2FA not
-// set up, so the caller cannot enumerate accounts.
-func (s *Service) RequestPasswordReset(emailAddr string) (string, error) {
+// RequestPasswordReset stores a short-lived state token server-side and returns
+// an opaque requestID. Returns ("", nil) for unknown emails or accounts without
+// 2FA — callers always receive the same empty response, preventing enumeration.
+func (s *Service) RequestPasswordReset(emailAddr string) (requestID string, err error) {
 	var user models.User
 	if err := db.DB.Where("email = ?", emailAddr).First(&user).Error; err != nil {
 		return "", nil
@@ -76,17 +79,31 @@ func (s *Service) RequestPasswordReset(emailAddr string) (string, error) {
 	if !user.TOTPEnabled {
 		return "", nil
 	}
-	token, err := s.generateTypedToken(user.ID, "password_reset", 15*time.Minute)
+	stateToken, err := s.generateTypedToken(user.ID, "password_reset", 15*time.Minute)
 	if err != nil {
 		return "", err
 	}
-	return token, nil
+	id := uuid.New().String()
+	s.resetTokens.Store(id, stateToken)
+	// auto-evict after 15 min
+	go func() {
+		time.Sleep(15 * time.Minute)
+		s.resetTokens.Delete(id)
+	}()
+	return id, nil
 }
 
-// ResetPassword validates the state token + TOTP code, then updates the password.
-func (s *Service) ResetPassword(stateToken, totpCode, newPassword string) error {
+// ResetPassword looks up the state token by requestID, validates TOTP, updates password.
+func (s *Service) ResetPassword(requestID, totpCode, newPassword string) error {
+	val, ok := s.resetTokens.Load(requestID)
+	if !ok {
+		return errors.New("session expired, please start over")
+	}
+	stateToken := val.(string)
+
 	userID, err := s.validateTypedToken(stateToken, "password_reset")
 	if err != nil {
+		s.resetTokens.Delete(requestID)
 		return errors.New("session expired, please start over")
 	}
 
@@ -94,7 +111,6 @@ func (s *Service) ResetPassword(stateToken, totpCode, newPassword string) error 
 	if err := db.DB.First(&user, "id = ?", userID).Error; err != nil {
 		return errors.New("user not found")
 	}
-
 	if err := s.checkTOTP(&user, totpCode); err != nil {
 		return err
 	}
@@ -103,6 +119,7 @@ func (s *Service) ResetPassword(stateToken, totpCode, newPassword string) error 
 	if err != nil {
 		return err
 	}
+	s.resetTokens.Delete(requestID) // single use
 	return db.DB.Model(&user).Update("password_hash", string(hashed)).Error
 }
 
@@ -271,19 +288,115 @@ func (s *Service) SetupTOTP(userID string) (string, error) {
 	return key.URL(), nil
 }
 
-// ConfirmTOTP validates the first code from the authenticator and enables 2FA.
-func (s *Service) ConfirmTOTP(userID, code string) error {
+// ConfirmTOTP validates the first code from the authenticator, enables 2FA,
+// and returns a fresh set of 8 one-time backup codes.
+func (s *Service) ConfirmTOTP(userID, code string) ([]string, error) {
 	var user models.User
 	if err := db.DB.First(&user, "id = ?", userID).Error; err != nil {
-		return errors.New("user not found")
+		return nil, errors.New("user not found")
 	}
 	if user.TOTPSecret == "" {
-		return errors.New("run 2FA setup first")
+		return nil, errors.New("run 2FA setup first")
 	}
 	if err := s.checkTOTP(&user, code); err != nil {
-		return err
+		return nil, err
 	}
-	return db.DB.Model(&user).Update("totp_enabled", true).Error
+	if err := db.DB.Model(&user).Update("totp_enabled", true).Error; err != nil {
+		return nil, err
+	}
+	return s.generateBackupCodes(userID)
+}
+
+// BackupCodeCount returns how many unused backup codes the user has left.
+func (s *Service) BackupCodeCount(userID string) (int64, error) {
+	var count int64
+	err := db.DB.Model(&models.BackupCode{}).
+		Where("user_id = ? AND used_at IS NULL", userID).
+		Count(&count).Error
+	return count, err
+}
+
+// RegenerateBackupCodes replaces all existing codes and returns 8 new plaintext ones.
+// Requires a valid TOTP code as confirmation.
+func (s *Service) RegenerateBackupCodes(userID, totpCode string) ([]string, error) {
+	var user models.User
+	if err := db.DB.First(&user, "id = ?", userID).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+	if !user.TOTPEnabled {
+		return nil, errors.New("2FA is not enabled")
+	}
+	if err := s.checkTOTP(&user, totpCode); err != nil {
+		return nil, err
+	}
+	return s.generateBackupCodes(userID)
+}
+
+// LoginWithBackupCode validates an opaque backup code and issues a full JWT.
+func (s *Service) LoginWithBackupCode(stateToken, rawCode string) (string, error) {
+	userID, err := s.validateTypedToken(stateToken, "2fa_state")
+	if err != nil {
+		return "", errors.New("session expired, please log in again")
+	}
+
+	normalized := normalizeBackupCode(rawCode)
+	var codes []models.BackupCode
+	if err := db.DB.Where("user_id = ? AND used_at IS NULL", userID).Find(&codes).Error; err != nil {
+		return "", errors.New("could not verify backup code")
+	}
+	for _, c := range codes {
+		if err := bcrypt.CompareHashAndPassword([]byte(c.CodeHash), []byte(normalized)); err == nil {
+			now := time.Now()
+			db.DB.Model(&c).Update("used_at", &now)
+			return s.GenerateToken(userID)
+		}
+	}
+	return "", errors.New("invalid backup code")
+}
+
+// generateBackupCodes deletes existing codes and creates 8 new ones.
+// Returns plaintext codes — shown to the user once.
+func (s *Service) generateBackupCodes(userID string) ([]string, error) {
+	db.DB.Where("user_id = ?", userID).Delete(&models.BackupCode{})
+
+	const codeChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+	plain := make([]string, 8)
+	for i := range plain {
+		b := make([]byte, 8)
+		if _, err := crand.Read(b); err != nil {
+			return nil, err
+		}
+		code := make([]byte, 8)
+		for j := range code {
+			code[j] = codeChars[b[j]%32]
+		}
+		plain[i] = string(code[:4]) + "-" + string(code[4:])
+	}
+
+	for _, p := range plain {
+		hash, err := bcrypt.GenerateFromPassword([]byte(normalizeBackupCode(p)), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, err
+		}
+		db.DB.Create(&models.BackupCode{UserID: userID, CodeHash: string(hash)})
+	}
+	return plain, nil
+}
+
+func normalizeBackupCode(code string) string {
+	// strip hyphens and uppercase before comparison
+	result := make([]byte, 0, len(code))
+	for i := 0; i < len(code); i++ {
+		c := code[i]
+		if c == '-' {
+			continue
+		}
+		if c >= 'a' && c <= 'z' {
+			c -= 32
+		}
+		result = append(result, c)
+	}
+	return string(result)
 }
 
 // DisableTOTP requires a valid code before removing 2FA from the account.

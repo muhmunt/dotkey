@@ -81,12 +81,12 @@ export const auth = {
       method: "POST", body: JSON.stringify({ code }),
     }),
   forgotPassword: (email: string) =>
-    req<{ state_token?: string }>("/api/v1/auth/forgot-password", {
+    req<{ request_id: string }>("/api/v1/auth/forgot-password", {
       method: "POST", body: JSON.stringify({ email }),
     }),
-  resetPassword: (state_token: string, code: string, new_password: string) =>
+  resetPassword: (request_id: string, code: string, new_password: string) =>
     req<{ message: string }>("/api/v1/auth/reset-password", {
-      method: "POST", body: JSON.stringify({ state_token, code, new_password }),
+      method: "POST", body: JSON.stringify({ request_id, code, new_password }),
     }),
   deleteMe: (password: string) =>
     req<{ message: string }>("/api/v1/auth/me", {

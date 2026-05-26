@@ -7,17 +7,24 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
+	"log"
 )
 
 type Crypto struct {
 	key []byte
 }
 
+// New creates a Crypto instance. The key must be exactly 32 bytes (AES-256).
+// The server will not start with a key of any other length.
 func New(key string) *Crypto {
-	b := []byte(key)
-	padded := make([]byte, 32)
-	copy(padded, b)
-	return &Crypto{key: padded}
+	if len(key) != 32 {
+		log.Fatalf(
+			"ENCRYPTION_KEY must be exactly 32 bytes, got %d.\n"+
+				"Generate a valid key with: openssl rand -hex 16",
+			len(key),
+		)
+	}
+	return &Crypto{key: []byte(key)}
 }
 
 func (c *Crypto) Encrypt(plaintext string) (string, error) {

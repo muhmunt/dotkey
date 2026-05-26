@@ -45,3 +45,12 @@ func (h *Handler) Delete(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "webhook deleted"})
 }
+
+func (h *Handler) Deliveries(c *gin.Context) {
+	deliveries, err := h.svc.Deliveries(c.Param("id"), c.Param("wid"), c.GetString("user_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, deliveries)
+}

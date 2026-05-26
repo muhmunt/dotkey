@@ -35,7 +35,10 @@ func (s *Service) Generate(projectID, actorID, name, permissions string) (plaint
 		permissions = "read"
 	}
 
-	raw := generateRaw()
+	raw, err := generateRaw()
+	if err != nil {
+		return "", nil, errors.New("failed to generate token")
+	}
 	hash := hashToken(raw)
 
 	t := &models.ProjectToken{
@@ -70,12 +73,12 @@ func (s *Service) Revoke(projectID, tokenID, actorID string) error {
 	return s.repo.Delete(tokenID, projectID)
 }
 
-func generateRaw() string {
+func generateRaw() (string, error) {
 	b := make([]byte, 24)
 	if _, err := rand.Read(b); err != nil {
-		panic(err)
+		return "", err
 	}
-	return "dotkey_tok_" + hex.EncodeToString(b)
+	return "dotkey_tok_" + hex.EncodeToString(b), nil
 }
 
 func hashToken(raw string) string {

@@ -19,6 +19,7 @@ const actionColor: Record<string, string> = {
 }
 
 const PAGE_SIZE = 50
+const EMPTY_PAGE: any[] = []
 
 export default function HistoryPage() {
   const { id: projectId } = useParams<{ id: string }>()
@@ -29,7 +30,7 @@ export default function HistoryPage() {
   const [offset, setOffset] = useState(0)
   const [allVersions, setAllVersions] = useState<any[]>([])
 
-  const { data: page = [], isLoading, isFetching } = useQuery({
+  const { data: page = EMPTY_PAGE, isLoading, isFetching } = useQuery({
     queryKey: ["history", projectId, selectedEnv?.id, offset],
     queryFn: () => history.list(projectId, selectedEnv!.id, offset, PAGE_SIZE),
     enabled: !!selectedEnv,

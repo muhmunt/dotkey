@@ -2,11 +2,11 @@
 
 import { useParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { webhooks } from "@/lib/api"
+import { webhooks, type WebhookDelivery } from "@/lib/api"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Webhook, Plus, Trash2, X } from "lucide-react"
+import { Webhook, Plus, Trash2, X, ChevronDown, ChevronUp } from "lucide-react"
 import { toast } from "sonner"
 import { formatDate } from "@/lib/utils"
 import { cn } from "@/lib/utils"
@@ -23,6 +23,13 @@ export default function WebhooksPage() {
   })
 
   const [showAdd, setShowAdd] = useState(false)
+  const [openDeliveries, setOpenDeliveries] = useState<string | null>(null)
+
+  const { data: deliveries = [] } = useQuery({
+    queryKey: ["deliveries", projectId, openDeliveries],
+    queryFn: () => webhooks.deliveries(projectId, openDeliveries!),
+    enabled: !!openDeliveries,
+  })
   const [url, setUrl] = useState("")
   const [urlError, setUrlError] = useState("")
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set(ALL_EVENTS))
@@ -140,28 +147,70 @@ export default function WebhooksPage() {
       {list.length > 0 && (
         <div className="border border-border rounded-md overflow-hidden">
           {list.map((hook, i) => (
-            <div
-              key={hook.id}
-              className={cn("flex items-start gap-3 px-4 py-3", i > 0 && "border-t border-border")}
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-mono text-foreground truncate">{hook.url}</p>
-                <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                  {hook.events.map(ev => (
-                    <span key={ev} className="text-xs font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-                      {ev}
-                    </span>
-                  ))}
+            <div key={hook.id} className={cn(i > 0 && "border-t border-border")}>
+              <div className="flex items-start gap-3 px-4 py-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-mono text-foreground truncate">{hook.url}</p>
+                  <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                    {hook.events.map(ev => (
+                      <span key={ev} className="text-xs font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                        {ev}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5">Added {formatDate(hook.created_at)}</p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1.5">Added {formatDate(hook.created_at)}</p>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => setOpenDeliveries(prev => prev === hook.id ? null : hook.id)}
+                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-1.5 py-1 rounded hover:bg-muted/50"
+                    title="View deliveries"
+                  >
+                    {openDeliveries === hook.id ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                    Deliveries
+                  </button>
+                  <button
+                    onClick={() => { if (confirm("Delete this webhook?")) remove.mutate(hook.id) }}
+                    className="p-1 text-muted-foreground hover:text-destructive transition-colors"
+                    title="Delete webhook"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => { if (confirm("Delete this webhook?")) remove.mutate(hook.id) }}
-                className="p-1 text-muted-foreground hover:text-destructive transition-colors shrink-0"
-                title="Delete webhook"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+
+              {openDeliveries === hook.id && (
+                <div className="border-t border-border bg-muted/20 px-4 py-3">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Last deliveries</p>
+                  {deliveries.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No deliveries yet.</p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {deliveries.map((d: WebhookDelivery) => (
+                        <div key={d.id} className="flex items-center gap-3 text-xs">
+                          <span className="text-muted-foreground w-36 shrink-0 font-mono">
+                            {new Date(d.delivered_at).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })}
+                          </span>
+                          <span className="font-mono text-foreground">{d.event}</span>
+                          <span className={cn(
+                            "ml-auto shrink-0 font-mono px-1.5 py-0.5 rounded text-xs",
+                            d.response_status >= 200 && d.response_status < 300
+                              ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                              : "bg-destructive/10 text-destructive border border-destructive/20"
+                          )}>
+                            {d.response_status === 0 ? "timeout" : d.response_status}
+                          </span>
+                          {d.error && (
+                            <span className="text-muted-foreground truncate max-w-[200px]" title={d.error}>
+                              {d.error}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>

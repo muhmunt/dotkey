@@ -72,7 +72,7 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	audit.Log("", "login.success", c.ClientIP(), "email: "+input.Email)
+	audit.Log(result.UserID, "login.success", c.ClientIP(), "email: "+input.Email)
 	c.JSON(http.StatusOK, gin.H{"token": result.Token})
 }
 
@@ -88,13 +88,13 @@ func (h *Handler) Login2FA(c *gin.Context) {
 		return
 	}
 
-	token, err := h.svc.Complete2FALogin(input.StateToken, input.Code)
+	token, userID, err := h.svc.Complete2FALogin(input.StateToken, input.Code)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	audit.Log("", "login.success.2fa", c.ClientIP(), "")
+	audit.Log(userID, "login.success.2fa", c.ClientIP(), "")
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
@@ -282,11 +282,12 @@ func (h *Handler) LoginBackupCode(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token, err := h.svc.LoginWithBackupCode(input.StateToken, input.BackupCode)
+	token, userID, err := h.svc.LoginWithBackupCode(input.StateToken, input.BackupCode)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
+	audit.Log(userID, "login.success.2fa", c.ClientIP(), "via backup code")
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
@@ -355,9 +356,14 @@ func (h *Handler) AuditLog(c *gin.Context) {
 // ── Device flow ───────────────────────────────────────────────────────────────
 
 func (h *Handler) DeviceCode(c *gin.Context) {
+	userCode, err := generateUserCode()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate device code"})
+		return
+	}
 	dc := &models.DeviceCode{
 		DeviceCode: uuid.New().String(),
-		UserCode:   generateUserCode(),
+		UserCode:   userCode,
 		ExpiresAt:  time.Now().Add(15 * time.Minute),
 	}
 	if err := db.DB.Create(dc).Error; err != nil {
@@ -429,15 +435,15 @@ func (h *Handler) DeviceActivate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "device activated"})
 }
 
-func generateUserCode() string {
+func generateUserCode() (string, error) {
 	const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 	b := make([]byte, 8)
 	if _, err := rand.Read(b); err != nil {
-		panic(err)
+		return "", err
 	}
 	code := make([]byte, 8)
 	for i := range code {
 		code[i] = chars[b[i]%32]
 	}
-	return string(code[:4]) + "-" + string(code[4:])
+	return string(code[:4]) + "-" + string(code[4:]), nil
 }

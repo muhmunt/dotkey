@@ -62,6 +62,7 @@ type typedClaims struct {
 
 type LoginResult struct {
 	Token       string // set when 2FA not enabled
+	UserID      string // set in the non-2FA path so the handler can audit-log it
 	Requires2FA bool   // set when 2FA is enabled
 	StateToken  string // short-lived token to carry through the 2FA step
 }
@@ -235,26 +236,27 @@ func (s *Service) Login(email, password string) (*LoginResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &LoginResult{Token: token}, nil
+	return &LoginResult{Token: token, UserID: user.ID}, nil
 }
 
 // Complete2FALogin validates a state token + TOTP code and issues a full JWT.
-func (s *Service) Complete2FALogin(stateToken, code string) (string, error) {
-	userID, err := s.validateTypedToken(stateToken, "2fa_state")
+func (s *Service) Complete2FALogin(stateToken, code string) (token, userID string, err error) {
+	userID, err = s.validateTypedToken(stateToken, "2fa_state")
 	if err != nil {
-		return "", errors.New("session expired, please log in again")
+		return "", "", errors.New("session expired, please log in again")
 	}
 
 	var user models.User
 	if err := db.DB.First(&user, "id = ?", userID).Error; err != nil {
-		return "", errors.New("user not found")
+		return "", "", errors.New("user not found")
 	}
 
 	if err := s.checkTOTP(&user, code); err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return s.GenerateToken(userID)
+	token, err = s.GenerateToken(userID)
+	return token, userID, err
 }
 
 // ── TOTP 2FA ──────────────────────────────────────────────────────────────────
@@ -333,25 +335,26 @@ func (s *Service) RegenerateBackupCodes(userID, totpCode string) ([]string, erro
 }
 
 // LoginWithBackupCode validates an opaque backup code and issues a full JWT.
-func (s *Service) LoginWithBackupCode(stateToken, rawCode string) (string, error) {
-	userID, err := s.validateTypedToken(stateToken, "2fa_state")
+func (s *Service) LoginWithBackupCode(stateToken, rawCode string) (token, userID string, err error) {
+	userID, err = s.validateTypedToken(stateToken, "2fa_state")
 	if err != nil {
-		return "", errors.New("session expired, please log in again")
+		return "", "", errors.New("session expired, please log in again")
 	}
 
 	normalized := normalizeBackupCode(rawCode)
 	var codes []models.BackupCode
 	if err := db.DB.Where("user_id = ? AND used_at IS NULL", userID).Find(&codes).Error; err != nil {
-		return "", errors.New("could not verify backup code")
+		return "", "", errors.New("could not verify backup code")
 	}
 	for _, c := range codes {
 		if err := bcrypt.CompareHashAndPassword([]byte(c.CodeHash), []byte(normalized)); err == nil {
 			now := time.Now()
 			db.DB.Model(&c).Update("used_at", &now)
-			return s.GenerateToken(userID)
+			token, err = s.GenerateToken(userID)
+			return token, userID, err
 		}
 	}
-	return "", errors.New("invalid backup code")
+	return "", "", errors.New("invalid backup code")
 }
 
 // generateBackupCodes deletes existing codes and creates 8 new ones.

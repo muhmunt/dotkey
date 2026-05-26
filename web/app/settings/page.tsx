@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { formatDate } from "@/lib/utils"
-import { Shield, ShieldOff, ShieldCheck, Smartphone, Pencil, Check, X } from "lucide-react"
+import { Shield, ShieldOff, ShieldCheck, Smartphone, Pencil, Check, X, Copy, Download, RefreshCw } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -57,11 +57,23 @@ export default function SettingsPage() {
 
   // 2FA setup state
   const [qrURL, setQrURL] = useState("")
-  const [setupStep, setSetupStep] = useState<"idle" | "scan" | "confirm">("idle")
+  const [setupStep, setSetupStep] = useState<"idle" | "scan" | "confirm" | "codes">("idle")
   const [confirmCode, setConfirmCode] = useState("")
   const [disableCode, setDisableCode] = useState("")
   const [showDisable, setShowDisable] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [setupCodes, setSetupCodes] = useState<string[]>([])
+
+  // backup codes section
+  const [showRegenForm, setShowRegenForm] = useState(false)
+  const [regenCode, setRegenCode] = useState("")
+  const [regenCodes, setRegenCodes] = useState<string[]>([])
+
+  const { data: backupCodeData, refetch: refetchCount } = useQuery({
+    queryKey: ["backupCodeCount"],
+    queryFn: auth.backupCodeCount,
+    enabled: user?.totp_enabled ?? false,
+  })
 
   async function saveName() {
     if (!nameValue.trim()) return
@@ -116,9 +128,9 @@ export default function SettingsPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await auth.confirm2fa(confirmCode)
-      toast.success("2FA enabled — your secrets are now protected")
-      setSetupStep("idle")
+      const { backup_codes } = await auth.confirm2fa(confirmCode)
+      setSetupCodes(backup_codes)
+      setSetupStep("codes")
       setQrURL("")
       setConfirmCode("")
       refetch()
@@ -126,6 +138,37 @@ export default function SettingsPage() {
     } catch (err: any) {
       toast.error(err.message)
       setConfirmCode("")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function copyAllCodes(codes: string[]) {
+    navigator.clipboard.writeText(codes.join("\n"))
+    toast.success("Backup codes copied")
+  }
+
+  function downloadCodes(codes: string[]) {
+    const blob = new Blob([codes.join("\n")], { type: "text/plain" })
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(blob)
+    a.download = "dotkey-backup-codes.txt"
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
+  async function handleRegen(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const { backup_codes } = await auth.regenerateBackupCodes(regenCode)
+      setRegenCodes(backup_codes)
+      setShowRegenForm(false)
+      setRegenCode("")
+      refetchCount()
+    } catch (err: any) {
+      toast.error(err.message)
+      setRegenCode("")
     } finally {
       setLoading(false)
     }
@@ -276,7 +319,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="p-4">
-            {user?.totp_enabled ? (
+            {user?.totp_enabled && setupStep !== "codes" ? (
               // 2FA is enabled — show status + disable option
               <>
                 <p className="text-xs text-muted-foreground mb-4">
@@ -327,6 +370,31 @@ export default function SettingsPage() {
                     </div>
                   </form>
                 )}
+              </>
+            ) : setupStep === "codes" ? (
+              // show backup codes after enabling 2FA
+              <>
+                <p className="text-xs text-muted-foreground mb-3">
+                  2FA enabled. Store these backup codes somewhere safe — each works once if you lose your authenticator app.
+                </p>
+                <div className="grid grid-cols-2 gap-1.5 mb-3">
+                  {setupCodes.map(c => (
+                    <code key={c} className="text-xs font-mono px-2 py-1.5 rounded bg-input border border-border text-center tracking-wider">
+                      {c}
+                    </code>
+                  ))}
+                </div>
+                <div className="flex gap-2 mb-3">
+                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 flex-1" onClick={() => copyAllCodes(setupCodes)}>
+                    <Copy className="h-3 w-3" /> Copy all
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 flex-1" onClick={() => downloadCodes(setupCodes)}>
+                    <Download className="h-3 w-3" /> Download
+                  </Button>
+                </div>
+                <Button size="sm" className="h-7 text-xs" onClick={() => { setSetupStep("idle"); setSetupCodes([]) }}>
+                  Done
+                </Button>
               </>
             ) : setupStep === "idle" ? (
               // 2FA not enabled — prompt to set up
@@ -407,6 +475,79 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
+
+        {/* Backup codes */}
+        {user?.totp_enabled && (
+          <div className="border border-border rounded-lg overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-border bg-card/50 flex items-center gap-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Backup Codes</p>
+              {backupCodeData && (
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {backupCodeData.remaining} of 8 remaining
+                </span>
+              )}
+            </div>
+            <div className="p-4 space-y-3">
+              {regenCodes.length > 0 ? (
+                <>
+                  <p className="text-xs text-muted-foreground">New backup codes generated. Store them somewhere safe.</p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {regenCodes.map(c => (
+                      <code key={c} className="text-xs font-mono px-2 py-1.5 rounded bg-input border border-border text-center tracking-wider">
+                        {c}
+                      </code>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 flex-1" onClick={() => copyAllCodes(regenCodes)}>
+                      <Copy className="h-3 w-3" /> Copy all
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 flex-1" onClick={() => downloadCodes(regenCodes)}>
+                      <Download className="h-3 w-3" /> Download
+                    </Button>
+                  </div>
+                  <Button size="sm" className="h-7 text-xs" onClick={() => setRegenCodes([])}>Done</Button>
+                </>
+              ) : showRegenForm ? (
+                <form onSubmit={handleRegen} className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Enter your authenticator code to replace all existing backup codes:
+                  </p>
+                  <Input
+                    value={regenCode}
+                    onChange={e => setRegenCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    placeholder="000 000"
+                    className="h-10 text-center font-mono text-lg tracking-[0.4em] bg-input border-border"
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <Button type="submit" size="sm" className="h-7 text-xs" disabled={regenCode.length < 6 || loading}>
+                      {loading ? "Generating…" : "Generate new codes"}
+                    </Button>
+                    <Button type="button" variant="ghost" size="sm" className="h-7 text-xs"
+                      onClick={() => { setShowRegenForm(false); setRegenCode("") }}>
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <p className="text-xs text-muted-foreground">
+                    Use these if you lose access to your authenticator app. Regenerating invalidates all existing codes.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs gap-1.5"
+                    onClick={() => setShowRegenForm(true)}
+                  >
+                    <RefreshCw className="h-3 w-3" /> Regenerate codes
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* CLI */}
         <div className="border border-border rounded-lg overflow-hidden">

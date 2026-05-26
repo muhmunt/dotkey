@@ -52,6 +52,7 @@ nav:
       - Team Management: dashboard/team.md
       - Keyboard Shortcuts: dashboard/shortcuts.md
       - Account Settings: dashboard/settings.md
+      - Security Log: dashboard/audit-log.md
   - CLI:
       - Installation: cli/installation.md
       - Authentication: cli/authentication.md

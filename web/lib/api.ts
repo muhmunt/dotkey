@@ -69,7 +69,17 @@ export const auth = {
   setup2fa: () =>
     req<{ qr_url: string }>("/api/v1/auth/2fa/setup", { method: "POST" }),
   confirm2fa: (code: string) =>
-    req<{ message: string }>("/api/v1/auth/2fa/confirm", {
+    req<{ message: string; backup_codes: string[] }>("/api/v1/auth/2fa/confirm", {
+      method: "POST", body: JSON.stringify({ code }),
+    }),
+  loginBackupCode: (state_token: string, backup_code: string) =>
+    req<{ token: string }>("/api/v1/auth/login/backup-code", {
+      method: "POST", body: JSON.stringify({ state_token, backup_code }),
+    }),
+  backupCodeCount: () =>
+    req<{ remaining: number }>("/api/v1/auth/2fa/backup-codes/count"),
+  regenerateBackupCodes: (code: string) =>
+    req<{ backup_codes: string[] }>("/api/v1/auth/2fa/backup-codes/regenerate", {
       method: "POST", body: JSON.stringify({ code }),
     }),
   disable2fa: (code: string) =>
@@ -260,6 +270,15 @@ export interface Webhook {
   created_at: string
 }
 
+export interface WebhookDelivery {
+  id: string
+  webhook_id: string
+  event: string
+  response_status: number
+  error: string
+  delivered_at: string
+}
+
 export const webhooks = {
   list: (projectId: string) =>
     req<Webhook[]>(`/api/v1/projects/${projectId}/webhooks`),
@@ -269,6 +288,8 @@ export const webhooks = {
     }),
   delete: (projectId: string, webhookId: string) =>
     req<void>(`/api/v1/projects/${projectId}/webhooks/${webhookId}`, { method: "DELETE" }),
+  deliveries: (projectId: string, webhookId: string) =>
+    req<WebhookDelivery[]>(`/api/v1/projects/${projectId}/webhooks/${webhookId}/deliveries`),
 }
 
 // ── History & Rollback ────────────────────────────────────────────────────────

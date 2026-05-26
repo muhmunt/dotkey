@@ -7,11 +7,11 @@ import { auth } from "@/lib/api"
 import { isLoggedIn } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Terminal, Shield, Smartphone } from "lucide-react"
+import { Terminal, Shield, Smartphone, Copy, Download } from "lucide-react"
 import { toast } from "sonner"
 import QRCode from "react-qr-code"
 
-type Step = "intro" | "scan" | "confirm"
+type Step = "intro" | "scan" | "confirm" | "codes"
 
 export default function Setup2FAPage() {
   const router = useRouter()
@@ -21,6 +21,7 @@ export default function Setup2FAPage() {
   const [qrURL, setQrURL] = useState("")
   const [code, setCode] = useState("")
   const [loading, setLoading] = useState(false)
+  const [backupCodes, setBackupCodes] = useState<string[]>([])
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ["me"],
@@ -55,15 +56,29 @@ export default function Setup2FAPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await auth.confirm2fa(code)
-      toast.success("2FA enabled — your account is now protected")
-      router.replace(isOnboarding ? "/welcome" : "/projects")
+      const { backup_codes } = await auth.confirm2fa(code)
+      setBackupCodes(backup_codes)
+      setStep("codes")
     } catch (err: any) {
       toast.error(err.message)
       setCode("")
     } finally {
       setLoading(false)
     }
+  }
+
+  function copyAllCodes() {
+    navigator.clipboard.writeText(backupCodes.join("\n"))
+    toast.success("Backup codes copied")
+  }
+
+  function downloadCodes() {
+    const blob = new Blob([backupCodes.join("\n")], { type: "text/plain" })
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(blob)
+    a.download = "dotkey-backup-codes.txt"
+    a.click()
+    URL.revokeObjectURL(a.href)
   }
 
   if (userLoading || !user) return null
@@ -151,6 +166,36 @@ export default function Setup2FAPage() {
                   ← Back to QR code
                 </button>
               </form>
+            </>
+          )}
+
+          {step === "codes" && (
+            <>
+              <h1 className="text-base font-semibold mb-1">Save your backup codes</h1>
+              <p className="text-sm text-muted-foreground mb-4">
+                Store these somewhere safe — each code works once if you lose your authenticator app.
+              </p>
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {backupCodes.map(c => (
+                  <code key={c} className="text-xs font-mono px-2 py-1.5 rounded bg-input border border-border text-center tracking-wider">
+                    {c}
+                  </code>
+                ))}
+              </div>
+              <div className="flex gap-2 mb-4">
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 flex-1" onClick={copyAllCodes}>
+                  <Copy className="h-3 w-3" /> Copy all
+                </Button>
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 flex-1" onClick={downloadCodes}>
+                  <Download className="h-3 w-3" /> Download
+                </Button>
+              </div>
+              <Button
+                className="w-full h-9 btn-glow"
+                onClick={() => router.replace(isOnboarding ? "/welcome" : "/projects")}
+              >
+                I&apos;ve saved them →
+              </Button>
             </>
           )}
         </div>

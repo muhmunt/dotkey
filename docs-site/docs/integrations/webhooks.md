@@ -67,8 +67,30 @@ if (event === "variable.updated" && environment_name === "production") {
 }
 ```
 
+## URL validation
+
+Webhook URLs must be publicly reachable HTTP or HTTPS endpoints. The following are rejected at creation time:
+
+- Non-HTTP/HTTPS schemes (`ftp://`, `file://`, etc.)
+- Loopback addresses (`127.x.x.x`, `::1`)
+- Private IP ranges (`10.x`, `172.16–31.x`, `192.168.x`)
+- Link-local addresses (`169.254.x.x` — AWS/GCP metadata endpoints)
+- Unspecified addresses (`0.0.0.0`)
+
 ## Delivery behaviour
 
 - Requests time out after **5 seconds**
-- Failed deliveries are **not retried** — use an idempotent handler
+- Failed deliveries are **not retried** — design your handler to be idempotent
 - Only `active` webhooks receive deliveries
+
+## Debugging with the delivery log
+
+If your endpoint is not receiving events, check the delivery log in the dashboard (project → Webhooks → click the webhook → Deliveries) or via the API:
+
+```
+GET /api/v1/projects/:id/webhooks/:wid/deliveries
+```
+
+The log shows the last 25 attempts, including the HTTP status code and any network error. A `response_status` of `0` means dotkey never received an HTTP response (timeout or DNS failure).
+
+See [Webhooks API](../api/webhooks.md#delivery-log) for the full endpoint reference.

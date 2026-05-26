@@ -28,6 +28,8 @@ export default function LoginPage() {
   const [totpError, setTotpError] = useState("")
   const [needs2FA, setNeeds2FA] = useState(false)
   const [verifying, setVerifying] = useState(false)
+  const [useBackup, setUseBackup] = useState(false)
+  const [backupCode, setBackupCode] = useState("")
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -61,6 +63,22 @@ export default function LoginPage() {
     } catch (err: any) {
       setTotpError(err.message)
       setTotpCode("")
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  async function handleBackupCode(e: React.FormEvent) {
+    e.preventDefault()
+    setTotpError("")
+    setVerifying(true)
+    try {
+      const { token } = await auth.loginBackupCode(stateToken, backupCode)
+      setToken(token)
+      router.push("/projects")
+    } catch (err: any) {
+      setTotpError(err.message)
+      setBackupCode("")
     } finally {
       setVerifying(false)
     }
@@ -120,32 +138,80 @@ export default function LoginPage() {
               <h1 className="text-base font-semibold">Two-factor authentication</h1>
             </div>
             <p className="text-sm text-muted-foreground mb-7">
-              Enter the 6-digit code from your authenticator app.
+              {useBackup
+                ? "Enter one of your 8-character backup codes."
+                : "Enter the 6-digit code from your authenticator app."}
             </p>
-            <form onSubmit={handle2FA} className="space-y-4">
-              <div className="space-y-1.5">
-                <Input
-                  value={totpCode}
-                  onChange={e => { setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); setTotpError("") }}
-                  placeholder="000 000"
-                  className={cn("h-13 text-center font-mono text-2xl tracking-[0.6em] bg-input border-border", totpError && "border-destructive")}
-                  maxLength={6}
-                  autoFocus
-                  autoComplete="one-time-code"
-                />
-                {totpError && <p className="text-xs text-destructive">{totpError}</p>}
-              </div>
-              <Button type="submit" disabled={totpCode.length < 6 || verifying} className="w-full h-9 btn-glow">
-                {verifying ? "Verifying…" : "Verify"}
-              </Button>
-              <button
-                type="button"
-                onClick={() => { setNeeds2FA(false); setStateToken(""); setTotpCode("") }}
-                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                ← Back to login
-              </button>
-            </form>
+
+            {!useBackup ? (
+              <form onSubmit={handle2FA} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Input
+                    value={totpCode}
+                    onChange={e => { setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); setTotpError("") }}
+                    placeholder="000 000"
+                    className={cn("h-13 text-center font-mono text-2xl tracking-[0.6em] bg-input border-border", totpError && "border-destructive")}
+                    maxLength={6}
+                    autoFocus
+                    autoComplete="one-time-code"
+                  />
+                  {totpError && <p className="text-xs text-destructive">{totpError}</p>}
+                </div>
+                <Button type="submit" disabled={totpCode.length < 6 || verifying} className="w-full h-9 btn-glow">
+                  {verifying ? "Verifying…" : "Verify"}
+                </Button>
+                <div className="flex flex-col gap-1.5 items-center">
+                  <button
+                    type="button"
+                    onClick={() => { setUseBackup(true); setTotpCode(""); setTotpError("") }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Use a backup code instead
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setNeeds2FA(false); setStateToken(""); setTotpCode("") }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    ← Back to login
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleBackupCode} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Input
+                    value={backupCode}
+                    onChange={e => { setBackupCode(e.target.value.toUpperCase().slice(0, 9)); setTotpError("") }}
+                    placeholder="XXXX-XXXX"
+                    className={cn("h-13 text-center font-mono text-xl tracking-widest bg-input border-border", totpError && "border-destructive")}
+                    maxLength={9}
+                    autoFocus
+                    autoComplete="off"
+                  />
+                  {totpError && <p className="text-xs text-destructive">{totpError}</p>}
+                </div>
+                <Button type="submit" disabled={backupCode.length < 8 || verifying} className="w-full h-9 btn-glow">
+                  {verifying ? "Verifying…" : "Use backup code"}
+                </Button>
+                <div className="flex flex-col gap-1.5 items-center">
+                  <button
+                    type="button"
+                    onClick={() => { setUseBackup(false); setBackupCode(""); setTotpError("") }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Use authenticator app instead
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setNeeds2FA(false); setStateToken(""); setBackupCode("") }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    ← Back to login
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
       </div>

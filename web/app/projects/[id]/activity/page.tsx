@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import type { ActivityEntry } from "@/lib/api"
 
 const PAGE_SIZE = 50
+const EMPTY_PAGE: ActivityEntry[] = []
 
 const ACTION_STYLE: Record<string, string> = {
   created:     "text-emerald-400 bg-emerald-400/10",
@@ -50,7 +51,7 @@ export default function ActivityPage() {
     queryFn: () => environments.list(projectId),
   })
 
-  const { data: page = [], isLoading, isFetching } = useQuery({
+  const { data: page = EMPTY_PAGE, isLoading, isFetching } = useQuery({
     queryKey: ["activity", projectId, envFilter, actionFilter, offset],
     queryFn: () => activity.list(projectId, envFilter || undefined, actionFilter || undefined, offset, PAGE_SIZE),
   })

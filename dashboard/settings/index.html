@@ -16,7 +16,7 @@
         <link rel="prev" href="../shortcuts/">
       
       
-        <link rel="next" href="../../cli/installation/">
+        <link rel="next" href="../audit-log/">
       
       
         
@@ -1099,6 +1099,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#security-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security log
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#delete-account" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1113,6 +1124,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1803,6 +1842,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#security-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security log
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#delete-account" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1855,10 +1905,84 @@
 </ol>
 <div class="admonition info">
 <p class="admonition-title">2FA required</p>
-<p>Password reset requires an active 2FA setup. If you have lost access to your authenticator app, contact your instance administrator to reset your account manually.</p>
+<p>Password reset requires an active 2FA setup. If you have also lost access to
+your backup codes, contact your instance administrator.</p>
 </div>
 <h2 id="two-factor-authentication">Two-factor authentication<a class="headerlink" href="#two-factor-authentication" title="Permanent link">&para;</a></h2>
-<p>See <a href="../2fa/">2FA &amp; Reveal Lock</a> for full details.</p>
+<p>See <a href="../2fa/">2FA &amp; Reveal Lock</a> for the full guide, including backup codes and the reveal lock.</p>
+<p><strong>Quick actions from Settings:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View backup codes remaining</td>
+<td>Settings → Two-Factor Authentication → count shown</td>
+</tr>
+<tr>
+<td>Regenerate backup codes</td>
+<td>Settings → Two-Factor Authentication → <strong>Regenerate</strong> (requires TOTP code)</td>
+</tr>
+<tr>
+<td>Disable 2FA</td>
+<td>Settings → Two-Factor Authentication → <strong>Disable 2FA</strong> (requires TOTP code)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="security-log">Security log<a class="headerlink" href="#security-log" title="Permanent link">&para;</a></h2>
+<p>Settings → <strong>Security log</strong> shows recent security events on your account.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Security log
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>2026-05-26 14:03   export         project: my-app  env: production   IP 192.168.1.1
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>2026-05-26 09:11   login.success                                      IP 192.168.1.1
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>2026-05-25 22:44   password.changed                                   IP 10.0.0.5
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>2026-05-25 18:30   2fa.enabled                                        IP 10.0.0.5
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>2026-05-24 11:20   login.failed   email: you@example.com              IP 45.12.3.4
+</code></pre></div>
+<p><strong>Logged events:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>login.success</code></td>
+<td>Successful login (password only)</td>
+</tr>
+<tr>
+<td><code>login.success.2fa</code></td>
+<td>Successful login completed with 2FA</td>
+</tr>
+<tr>
+<td><code>login.failed</code></td>
+<td>Failed login attempt</td>
+</tr>
+<tr>
+<td><code>2fa.enabled</code></td>
+<td>2FA was enabled on the account</td>
+</tr>
+<tr>
+<td><code>2fa.disabled</code></td>
+<td>2FA was disabled on the account</td>
+</tr>
+<tr>
+<td><code>password.changed</code></td>
+<td>Password was changed via Settings</td>
+</tr>
+<tr>
+<td><code>export</code></td>
+<td>Variable values were exported (project and environment recorded)</td>
+</tr>
+</tbody>
+</table>
+<p>The log shows your own events only and retains the last 100 entries.</p>
 <h2 id="delete-account">Delete account<a class="headerlink" href="#delete-account" title="Permanent link">&para;</a></h2>
 <p>In the <strong>Danger zone</strong> section:</p>
 <ol>

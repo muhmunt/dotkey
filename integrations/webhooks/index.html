@@ -1013,6 +1013,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dashboard/audit-log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1562,10 +1590,32 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#url-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URL validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#delivery-behaviour" class="md-nav__link">
     <span class="md-ellipsis">
       
         Delivery behaviour
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-with-the-delivery-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging with the delivery log
       
     </span>
   </a>
@@ -1803,10 +1853,32 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#url-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URL validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#delivery-behaviour" class="md-nav__link">
     <span class="md-ellipsis">
       
         Delivery behaviour
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-with-the-delivery-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging with the delivery log
       
     </span>
   </a>
@@ -1888,12 +1960,27 @@
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="p">})</span>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">}</span>
 </code></pre></div>
+<h2 id="url-validation">URL validation<a class="headerlink" href="#url-validation" title="Permanent link">&para;</a></h2>
+<p>Webhook URLs must be publicly reachable HTTP or HTTPS endpoints. The following are rejected at creation time:</p>
+<ul>
+<li>Non-HTTP/HTTPS schemes (<code>ftp://</code>, <code>file://</code>, etc.)</li>
+<li>Loopback addresses (<code>127.x.x.x</code>, <code>::1</code>)</li>
+<li>Private IP ranges (<code>10.x</code>, <code>172.16–31.x</code>, <code>192.168.x</code>)</li>
+<li>Link-local addresses (<code>169.254.x.x</code> — AWS/GCP metadata endpoints)</li>
+<li>Unspecified addresses (<code>0.0.0.0</code>)</li>
+</ul>
 <h2 id="delivery-behaviour">Delivery behaviour<a class="headerlink" href="#delivery-behaviour" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Requests time out after <strong>5 seconds</strong></li>
-<li>Failed deliveries are <strong>not retried</strong> — use an idempotent handler</li>
+<li>Failed deliveries are <strong>not retried</strong> — design your handler to be idempotent</li>
 <li>Only <code>active</code> webhooks receive deliveries</li>
 </ul>
+<h2 id="debugging-with-the-delivery-log">Debugging with the delivery log<a class="headerlink" href="#debugging-with-the-delivery-log" title="Permanent link">&para;</a></h2>
+<p>If your endpoint is not receiving events, check the delivery log in the dashboard (project → Webhooks → click the webhook → Deliveries) or via the API:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>GET /api/v1/projects/:id/webhooks/:wid/deliveries
+</code></pre></div>
+<p>The log shows the last 25 attempts, including the HTTP status code and any network error. A <code>response_status</code> of <code>0</code> means dotkey never received an HTTP response (timeout or DNS failure).</p>
+<p>See <a href="../../api/webhooks/#delivery-log">Webhooks API</a> for the full endpoint reference.</p>
 
 
 

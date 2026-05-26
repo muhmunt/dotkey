@@ -1013,6 +1013,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dashboard/audit-log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1392,6 +1420,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Create webhook">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URL validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1399,6 +1444,17 @@
     <span class="md-ellipsis">
       
         Delete webhook
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delivery-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delivery log
       
     </span>
   </a>
@@ -1778,6 +1834,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Create webhook">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URL validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1785,6 +1858,17 @@
     <span class="md-ellipsis">
       
         Delete webhook
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delivery-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delivery log
       
     </span>
   </a>
@@ -1836,7 +1920,7 @@
 <h1 id="webhooks-api">Webhooks API<a class="headerlink" href="#webhooks-api" title="Permanent link">&para;</a></h1>
 <p>Webhooks let dotkey notify your systems when variables change.</p>
 <p>Base path: <code>/api/v1/projects/:id/webhooks</code></p>
-<p>Requires <strong>owner</strong> or <strong>admin</strong> role for create/delete. All members can list.</p>
+<p>Requires <strong>owner</strong> or <strong>admin</strong> role for create/delete. All members can list and view deliveries.</p>
 <h2 id="list-webhooks">List webhooks<a class="headerlink" href="#list-webhooks" title="Permanent link">&para;</a></h2>
 <p><code>GET /api/v1/projects/:id/webhooks</code></p>
 <h2 id="create-webhook">Create webhook<a class="headerlink" href="#create-webhook" title="Permanent link">&para;</a></h2>
@@ -1876,58 +1960,149 @@
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://example.com/hooks/dotkey&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;events&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;variable.created&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;variable.updated&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;variable.deleted&quot;</span><span class="p">],</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">&quot;active&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">&quot;secret&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;a3f8c2d1e9b4...&quot;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">}</span>
 </code></pre></div></p>
+<p>The <code>secret</code> field is <strong>only included in the create response</strong> — it is not stored in plaintext and cannot be retrieved again. Save it now. If lost, delete and recreate the webhook.</p>
+<div class="admonition info">
+<p class="admonition-title">Secret encryption</p>
+<p>Webhook secrets are encrypted at rest in the database using AES-256-GCM
+(the same key as variable values). A database breach does not expose HMAC keys.</p>
+</div>
+<h3 id="url-validation">URL validation<a class="headerlink" href="#url-validation" title="Permanent link">&para;</a></h3>
+<p>Webhook URLs must be reachable public HTTP or HTTPS endpoints. The following are rejected at creation time:</p>
+<ul>
+<li>Non-HTTP/HTTPS schemes (<code>ftp://</code>, <code>file://</code>, etc.)</li>
+<li>Loopback addresses (<code>127.x.x.x</code>, <code>::1</code>)</li>
+<li>Private ranges (<code>10.x</code>, <code>172.16-31.x</code>, <code>192.168.x</code>)</li>
+<li>Link-local addresses (<code>169.254.x.x</code> — AWS/GCP metadata endpoints)</li>
+<li>Unspecified addresses (<code>0.0.0.0</code>)</li>
+</ul>
 <h2 id="delete-webhook">Delete webhook<a class="headerlink" href="#delete-webhook" title="Permanent link">&para;</a></h2>
 <p><code>DELETE /api/v1/projects/:id/webhooks/:wid</code></p>
+<h2 id="delivery-log">Delivery log<a class="headerlink" href="#delivery-log" title="Permanent link">&para;</a></h2>
+<p><code>GET /api/v1/projects/:id/webhooks/:wid/deliveries</code></p>
+<p>Returns the last 25 deliveries for the webhook, newest first.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">[</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">&quot;webhook_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variable.updated&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="nt">&quot;response_status&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="nt">&quot;delivered_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-05-26T14:03:00Z&quot;</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="nt">&quot;webhook_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variable.created&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="nt">&quot;response_status&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Post \&quot;https://example.com/hooks/dotkey\&quot;: context deadline exceeded (Client.Timeout exceeded while awaiting headers)&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="nt">&quot;delivered_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-05-26T12:00:00Z&quot;</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="p">]</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>response_status</code></td>
+<td>HTTP status code returned by the receiver. <code>0</code> means a network or timeout error — no HTTP response was received.</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>Empty on success. Contains the network error message when <code>response_status</code> is <code>0</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Delivery behaviour:</strong></p>
+<ul>
+<li>Requests time out after <strong>5 seconds</strong></li>
+<li>Failed deliveries are <strong>not retried</strong> — design your handler to be idempotent</li>
+<li>Only <code>active</code> webhooks receive deliveries</li>
+</ul>
 <h2 id="payload">Payload<a class="headerlink" href="#payload" title="Permanent link">&para;</a></h2>
 <p>dotkey sends a <code>POST</code> request with this JSON body:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variable.updated&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;project_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;abc123&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;environment_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xyz789&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&quot;environment_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;production&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">&quot;actor&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user-id&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-05-25T10:00:00Z&quot;</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;variable.updated&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">&quot;project_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;abc123&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">&quot;environment_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xyz789&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nt">&quot;environment_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;production&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nt">&quot;actor&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user-id&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-05-26T10:00:00Z&quot;</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="verifying-signatures">Verifying signatures<a class="headerlink" href="#verifying-signatures" title="Permanent link">&para;</a></h2>
 <p>Every delivery includes an <code>X-Dotkey-Signature</code> header:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>X-Dotkey-Signature: sha256=&lt;hex&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>X-Dotkey-Signature: sha256=&lt;hex&gt;
 </code></pre></div>
 <p>The value is <code>HMAC-SHA256(secret, raw_body)</code>. Verify it in your handler:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Node.js</label><label for="__tabbed_1_2">Python</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Node.js</label><label for="__tabbed_1_2">Python</label><label for="__tabbed_1_3">Go</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">crypto</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s2">&quot;crypto&quot;</span><span class="p">)</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kd">function</span><span class="w"> </span><span class="nx">verify</span><span class="p">(</span><span class="nx">secret</span><span class="p">,</span><span class="w"> </span><span class="nx">rawBody</span><span class="p">,</span><span class="w"> </span><span class="nx">signature</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">expected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sha256=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">crypto</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="s2">&quot;sha256&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">secret</span><span class="p">)</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">rawBody</span><span class="p">)</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s2">&quot;hex&quot;</span><span class="p">)</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">timingSafeEqual</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">expected</span><span class="p">),</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">signature</span><span class="p">))</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">crypto</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s2">&quot;crypto&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">function</span><span class="w"> </span><span class="nx">verify</span><span class="p">(</span><span class="nx">secret</span><span class="p">,</span><span class="w"> </span><span class="nx">rawBody</span><span class="p">,</span><span class="w"> </span><span class="nx">signature</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">expected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sha256=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">crypto</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="s2">&quot;sha256&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">secret</span><span class="p">)</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">rawBody</span><span class="p">)</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s2">&quot;hex&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">timingSafeEqual</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">expected</span><span class="p">),</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">signature</span><span class="p">))</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">}</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s2">&quot;/hooks/dotkey&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">verify</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">WEBHOOK_SECRET</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">rawBody</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;x-dotkey-signature&quot;</span><span class="p">]))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">401</span><span class="p">).</span><span class="nx">send</span><span class="p">(</span><span class="s2">&quot;Invalid signature&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">event</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">environment_name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">event</span><span class="si">}</span><span class="sb">: </span><span class="si">${</span><span class="nx">key</span><span class="si">}</span><span class="sb"> in </span><span class="si">${</span><span class="nx">environment_name</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">  </span><span class="nx">res</span><span class="p">.</span><span class="nx">sendStatus</span><span class="p">(</span><span class="mf">200</span><span class="p">)</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="p">})</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">hmac</span><span class="o">,</span><span class="w"> </span><span class="nn">hashlib</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">verify</span><span class="p">(</span><span class="n">secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">raw_body</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">expected</span> <span class="o">=</span> <span class="s2">&quot;sha256=&quot;</span> <span class="o">+</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="n">secret</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">raw_body</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">hmac</span><span class="o">,</span><span class="w"> </span><span class="nn">hashlib</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">abort</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">verify</span><span class="p">(</span><span class="n">secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">raw_body</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">expected</span> <span class="o">=</span> <span class="s2">&quot;sha256=&quot;</span> <span class="o">+</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="n">secret</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">raw_body</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/hooks/dotkey&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">def</span><span class="w"> </span><span class="nf">webhook</span><span class="p">():</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">verify</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;WEBHOOK_SECRET&quot;</span><span class="p">],</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>                  <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X-Dotkey-Signature&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)):</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>        <span class="n">abort</span><span class="p">(</span><span class="mi">401</span><span class="p">)</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;event&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;environment_name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">200</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">verify</span><span class="p">(</span><span class="nx">secret</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="w"> </span><span class="p">[]</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="nx">signature</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="nx">mac</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">hmac</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">sha256</span><span class="p">.</span><span class="nx">New</span><span class="p">,</span><span class="w"> </span><span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">secret</span><span class="p">))</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nx">mac</span><span class="p">.</span><span class="nx">Write</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nx">expected</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&quot;sha256=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">hex</span><span class="p">.</span><span class="nx">EncodeToString</span><span class="p">(</span><span class="nx">mac</span><span class="p">.</span><span class="nx">Sum</span><span class="p">(</span><span class="kc">nil</span><span class="p">))</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">hmac</span><span class="p">.</span><span class="nx">Equal</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">expected</span><span class="p">),</span><span class="w"> </span><span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">signature</span><span class="p">))</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">}</span>
 </code></pre></div>
 </div>
 </div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Secret storage</p>
-<p>The webhook secret is only returned once at creation time — store it securely.
-If lost, delete the webhook and create a new one.</p>
+<div class="admonition tip">
+<p class="admonition-title">Use the delivery log to debug</p>
+<p>If your endpoint is not receiving events, check the delivery log
+(<code>GET /projects/:id/webhooks/:wid/deliveries</code>) to see the HTTP status or
+network error for each attempt.</p>
 </div>
 
 

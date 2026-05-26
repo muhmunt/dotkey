@@ -10,29 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://muhmunt.github.io/dotkey/security/">
+        <link rel="canonical" href="https://muhmunt.github.io/dotkey/dashboard/audit-log/">
       
       
-        <link rel="prev" href="../contributing/architecture/">
+        <link rel="prev" href="../settings/">
       
+      
+        <link rel="next" href="../../cli/installation/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Security - dotkey</title>
+        <title>Security Log - dotkey</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -51,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#security" class="md-skip">
+        <a href="#security-log" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="dotkey" class="md-header__button md-logo" aria-label="dotkey" data-md-component="logo">
+    <a href="../.." title="dotkey" class="md-header__button md-logo" aria-label="dotkey" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Security
+              Security Log
             
           </span>
         </div>
@@ -197,7 +199,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -218,7 +220,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../getting-started/" class="md-tabs__link">
+        <a href="../../getting-started/" class="md-tabs__link">
           
   
   
@@ -238,7 +240,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../self-hosting/docker/" class="md-tabs__link">
+        <a href="../../self-hosting/docker/" class="md-tabs__link">
           
   
   
@@ -254,11 +256,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../dashboard/projects/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../projects/" class="md-tabs__link">
           
   
   
@@ -278,7 +282,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../cli/installation/" class="md-tabs__link">
+        <a href="../../cli/installation/" class="md-tabs__link">
           
   
   
@@ -298,7 +302,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../api/authentication/" class="md-tabs__link">
+        <a href="../../api/authentication/" class="md-tabs__link">
           
   
   
@@ -318,7 +322,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../integrations/github-actions/" class="md-tabs__link">
+        <a href="../../integrations/github-actions/" class="md-tabs__link">
           
   
   
@@ -338,7 +342,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../contributing/" class="md-tabs__link">
+        <a href="../../contributing/" class="md-tabs__link">
           
   
   
@@ -354,11 +358,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../../security/" class="md-tabs__link">
         
   
   
@@ -393,7 +395,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="dotkey" class="md-nav__button md-logo" aria-label="dotkey" data-md-component="logo">
+    <a href="../.." title="dotkey" class="md-nav__button md-logo" aria-label="dotkey" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -423,7 +425,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -504,7 +506,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -532,7 +534,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/quick-start/" class="md-nav__link">
+      <a href="../../getting-started/quick-start/" class="md-nav__link">
         
   
   
@@ -560,7 +562,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/manual-install/" class="md-nav__link">
+      <a href="../../getting-started/manual-install/" class="md-nav__link">
         
   
   
@@ -649,7 +651,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../self-hosting/docker/" class="md-nav__link">
+      <a href="../../self-hosting/docker/" class="md-nav__link">
         
   
   
@@ -677,7 +679,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../self-hosting/env-vars/" class="md-nav__link">
+      <a href="../../self-hosting/env-vars/" class="md-nav__link">
         
   
   
@@ -705,7 +707,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../self-hosting/env-encryption/" class="md-nav__link">
+      <a href="../../self-hosting/env-encryption/" class="md-nav__link">
         
   
   
@@ -737,28 +739,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -776,7 +781,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -794,7 +799,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/projects/" class="md-nav__link">
+      <a href="../projects/" class="md-nav__link">
         
   
   
@@ -822,7 +827,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/environments/" class="md-nav__link">
+      <a href="../environments/" class="md-nav__link">
         
   
   
@@ -850,7 +855,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/variables/" class="md-nav__link">
+      <a href="../variables/" class="md-nav__link">
         
   
   
@@ -878,7 +883,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/2fa/" class="md-nav__link">
+      <a href="../2fa/" class="md-nav__link">
         
   
   
@@ -906,7 +911,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/tokens/" class="md-nav__link">
+      <a href="../tokens/" class="md-nav__link">
         
   
   
@@ -934,7 +939,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/team/" class="md-nav__link">
+      <a href="../team/" class="md-nav__link">
         
   
   
@@ -962,7 +967,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/shortcuts/" class="md-nav__link">
+      <a href="../shortcuts/" class="md-nav__link">
         
   
   
@@ -990,7 +995,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/settings/" class="md-nav__link">
+      <a href="../settings/" class="md-nav__link">
         
   
   
@@ -1015,10 +1020,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../dashboard/audit-log/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Log
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1034,6 +1066,48 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#logged-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logged events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API access
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1107,7 +1181,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cli/installation/" class="md-nav__link">
+      <a href="../../cli/installation/" class="md-nav__link">
         
   
   
@@ -1135,7 +1209,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cli/authentication/" class="md-nav__link">
+      <a href="../../cli/authentication/" class="md-nav__link">
         
   
   
@@ -1163,7 +1237,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cli/commands/" class="md-nav__link">
+      <a href="../../cli/commands/" class="md-nav__link">
         
   
   
@@ -1252,7 +1326,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/authentication/" class="md-nav__link">
+      <a href="../../api/authentication/" class="md-nav__link">
         
   
   
@@ -1280,7 +1354,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/projects/" class="md-nav__link">
+      <a href="../../api/projects/" class="md-nav__link">
         
   
   
@@ -1308,7 +1382,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/variables/" class="md-nav__link">
+      <a href="../../api/variables/" class="md-nav__link">
         
   
   
@@ -1336,7 +1410,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/webhooks/" class="md-nav__link">
+      <a href="../../api/webhooks/" class="md-nav__link">
         
   
   
@@ -1425,7 +1499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../integrations/github-actions/" class="md-nav__link">
+      <a href="../../integrations/github-actions/" class="md-nav__link">
         
   
   
@@ -1453,7 +1527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../integrations/docker/" class="md-nav__link">
+      <a href="../../integrations/docker/" class="md-nav__link">
         
   
   
@@ -1481,7 +1555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../integrations/webhooks/" class="md-nav__link">
+      <a href="../../integrations/webhooks/" class="md-nav__link">
         
   
   
@@ -1570,7 +1644,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contributing/" class="md-nav__link">
+      <a href="../../contributing/" class="md-nav__link">
         
   
   
@@ -1598,7 +1672,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contributing/architecture/" class="md-nav__link">
+      <a href="../../contributing/architecture/" class="md-nav__link">
         
   
   
@@ -1630,37 +1704,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Security
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../security/" class="md-nav__link">
         
   
   
@@ -1676,169 +1723,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#secrets-at-rest" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Secrets at rest
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#env-file-encryption" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        .env file encryption
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#passwords" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Passwords
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sessions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sessions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#two-factor-authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Two-factor authentication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#webhook-secrets" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Webhook secrets
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ssrf-protection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SSRF protection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#security-headers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Security headers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#security-audit-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Security audit log
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cicd-tokens" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CI/CD tokens
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CORS
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rate-limiting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rate limiting
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reporting-vulnerabilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reporting vulnerabilities
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1870,10 +1754,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#secrets-at-rest" class="md-nav__link">
+  <a href="#logged-events" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Secrets at rest
+        Logged events
       
     </span>
   </a>
@@ -1881,131 +1765,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#env-file-encryption" class="md-nav__link">
+  <a href="#api-access" class="md-nav__link">
     <span class="md-ellipsis">
       
-        .env file encryption
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#passwords" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Passwords
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sessions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sessions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#two-factor-authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Two-factor authentication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#webhook-secrets" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Webhook secrets
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ssrf-protection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SSRF protection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#security-headers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Security headers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#security-audit-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Security audit log
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cicd-tokens" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CI/CD tokens
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CORS
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rate-limiting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rate limiting
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reporting-vulnerabilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reporting vulnerabilities
+        API access
       
     </span>
   </a>
@@ -2032,180 +1795,60 @@
   
 
 
-<h1 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h1>
-<h2 id="secrets-at-rest">Secrets at rest<a class="headerlink" href="#secrets-at-rest" title="Permanent link">&para;</a></h2>
-<p>Every variable value is encrypted with <strong>AES-256-GCM</strong> before being written to the database.</p>
-<ul>
-<li>A unique random nonce is generated for every encryption operation</li>
-<li>The same plaintext encrypted twice produces different ciphertexts</li>
-<li>Without the <code>ENCRYPTION_KEY</code>, the database contains only unreadable ciphertext</li>
-<li>The server refuses to start if <code>ENCRYPTION_KEY</code> is not exactly 32 bytes — short keys are never silently zero-padded</li>
-</ul>
-<h2 id="env-file-encryption">.env file encryption<a class="headerlink" href="#env-file-encryption" title="Permanent link">&para;</a></h2>
-<p>The server's own <code>.env</code> file (which contains <code>ENCRYPTION_KEY</code>, <code>JWT_SECRET</code>, <code>DATABASE_URL</code>) can be encrypted at rest using the <code>dotkey-enc</code> tool. Sensitive values are replaced with <code>encrypted:v1:…</code> blobs; the server decrypts them in memory at startup using <code>DOTKEY_MASTER_KEY</code>, which is never stored in the <code>.env</code> file itself.</p>
-<p>See <a href="../self-hosting/env-encryption/">.env Encryption</a> for the full guide.</p>
-<p>The CLI auth token stored in <code>~/.dotkey/config.yaml</code> is also encrypted at rest using a per-machine key (<code>~/.dotkey/key</code>, mode 0600).</p>
-<h2 id="passwords">Passwords<a class="headerlink" href="#passwords" title="Permanent link">&para;</a></h2>
-<p>User passwords are hashed with <strong>bcrypt</strong> (cost factor 10). The plaintext password is never stored or logged.</p>
-<h2 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h2>
-<ul>
-<li>JWT tokens are signed with <strong>HS256</strong> using <code>JWT_SECRET</code></li>
-<li>Tokens expire after <strong>24 hours</strong></li>
-<li>Sessions are silently refreshed when fewer than 1 hour remains — no action required</li>
-<li>Logout revokes the token server-side via a JTI blocklist (expired entries are purged every 10 minutes)</li>
-<li>Device codes (CLI login) expire after <strong>15 minutes</strong></li>
-</ul>
-<h2 id="two-factor-authentication">Two-factor authentication<a class="headerlink" href="#two-factor-authentication" title="Permanent link">&para;</a></h2>
-<p>TOTP 2FA is implemented per <strong>RFC 6238</strong> (the same standard used by Google Authenticator and Authy). 2FA is mandatory — all new accounts are redirected to the setup flow before they can access the dashboard.</p>
-<p>When enabled:
-- Login requires password <strong>and</strong> a 6-digit code from your authenticator app
-- Viewing secret values requires a separate 2FA unlock (15-minute session)
-- Even a stolen JWT cannot reveal secrets without the authenticator code
-- 8 one-time backup codes are issued at setup for account recovery if the authenticator is lost</p>
-<p>Password reset is also protected by TOTP — no SMTP server is required. The reset flow uses a short-lived server-side state token (returned as an opaque <code>request_id</code>) to prevent account enumeration.</p>
-<h2 id="webhook-secrets">Webhook secrets<a class="headerlink" href="#webhook-secrets" title="Permanent link">&para;</a></h2>
-<p>Webhook signing secrets are encrypted at rest in the database using <strong>AES-256-GCM</strong> (the same key as variable values). A database breach does not expose HMAC keys. The plaintext secret is shown only once at creation and cannot be retrieved again.</p>
-<h2 id="ssrf-protection">SSRF protection<a class="headerlink" href="#ssrf-protection" title="Permanent link">&para;</a></h2>
-<p>Webhook URLs are validated at creation time. The following targets are rejected:</p>
-<table>
-<thead>
-<tr>
-<th>Rejected class</th>
-<th>Examples</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Non-HTTP(S) schemes</td>
-<td><code>ftp://</code>, <code>file://</code></td>
-</tr>
-<tr>
-<td>Loopback addresses</td>
-<td><code>127.x.x.x</code>, <code>::1</code></td>
-</tr>
-<tr>
-<td>Private ranges</td>
-<td><code>10.x</code>, <code>172.16–31.x</code>, <code>192.168.x</code></td>
-</tr>
-<tr>
-<td>Link-local addresses</td>
-<td><code>169.254.x.x</code> (AWS/GCP metadata)</td>
-</tr>
-<tr>
-<td>Unspecified addresses</td>
-<td><code>0.0.0.0</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="security-headers">Security headers<a class="headerlink" href="#security-headers" title="Permanent link">&para;</a></h2>
-<p>Every API response includes the following headers:</p>
-<table>
-<thead>
-<tr>
-<th>Header</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>X-Content-Type-Options</code></td>
-<td><code>nosniff</code></td>
-</tr>
-<tr>
-<td><code>X-Frame-Options</code></td>
-<td><code>DENY</code></td>
-</tr>
-<tr>
-<td><code>X-XSS-Protection</code></td>
-<td><code>1; mode=block</code></td>
-</tr>
-<tr>
-<td><code>Referrer-Policy</code></td>
-<td><code>strict-origin-when-cross-origin</code></td>
-</tr>
-<tr>
-<td><code>Permissions-Policy</code></td>
-<td><code>geolocation=(), microphone=(), camera=()</code></td>
-</tr>
-<tr>
-<td><code>Content-Security-Policy</code></td>
-<td><code>default-src 'self'</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="security-audit-log">Security audit log<a class="headerlink" href="#security-audit-log" title="Permanent link">&para;</a></h2>
-<p>Key security events are logged to an <code>audit_logs</code> table and accessible via <code>GET /api/v1/auth/audit-log</code>. The log retains the last 100 entries per user.</p>
-<p><strong>Logged events:</strong></p>
+<h1 id="security-log">Security Log<a class="headerlink" href="#security-log" title="Permanent link">&para;</a></h1>
+<p>The security log records key account events — useful for spotting unexpected logins or unauthorized changes.</p>
+<p>Access it at <strong>Settings → Security log</strong>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Security log
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>2026-05-26 14:03   export         project: my-app  env: production   IP 192.168.1.1
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>2026-05-26 09:11   login.success                                      IP 192.168.1.1
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>2026-05-25 22:44   password.changed                                   IP 10.0.0.5
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>2026-05-25 18:30   2fa.enabled                                        IP 10.0.0.5
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>2026-05-24 11:20   login.failed   email: you@example.com              IP 45.12.3.4
+</code></pre></div>
+<h2 id="logged-events">Logged events<a class="headerlink" href="#logged-events" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Event</th>
-<th>Trigger</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>login.success</code></td>
-<td>Password login succeeded</td>
+<td>Successful login (password only)</td>
 </tr>
 <tr>
 <td><code>login.success.2fa</code></td>
-<td>2FA login step succeeded</td>
+<td>Successful login completed with 2FA</td>
 </tr>
 <tr>
 <td><code>login.failed</code></td>
-<td>Login attempt with wrong credentials</td>
+<td>Failed login attempt</td>
 </tr>
 <tr>
 <td><code>2fa.enabled</code></td>
-<td>2FA was enabled</td>
+<td>2FA was enabled on the account</td>
 </tr>
 <tr>
 <td><code>2fa.disabled</code></td>
-<td>2FA was disabled</td>
+<td>2FA was disabled on the account</td>
 </tr>
 <tr>
 <td><code>password.changed</code></td>
-<td>Password changed via Settings</td>
+<td>Password was changed via Settings</td>
 </tr>
 <tr>
 <td><code>export</code></td>
-<td>Variables exported (project and environment recorded)</td>
+<td>Variable values were exported — project and environment are recorded in the detail column</td>
 </tr>
 </tbody>
 </table>
-<p>See <a href="../dashboard/settings/#security-log">Account Settings</a> for the dashboard view.</p>
-<h2 id="cicd-tokens">CI/CD tokens<a class="headerlink" href="#cicd-tokens" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Project tokens are stored as <strong>SHA-256 hashes</strong> — the plaintext is shown only once at creation</li>
-<li>Tokens are scoped to a single project</li>
-<li>They never expire but can be revoked at any time</li>
-<li>Token auth bypasses the reveal lock (CI pipelines can pull secrets without a 2FA code)</li>
-</ul>
-<h2 id="cors">CORS<a class="headerlink" href="#cors" title="Permanent link">&para;</a></h2>
-<p>The API rejects cross-origin requests from any origin not listed in <code>ALLOWED_ORIGINS</code>. Set this to your dashboard domain in production.</p>
-<h2 id="rate-limiting">Rate limiting<a class="headerlink" href="#rate-limiting" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Endpoint</th>
-<th>Limit</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>All auth endpoints</td>
-<td>10 requests per 15 minutes per IP</td>
-</tr>
-<tr>
-<td><code>GET /users/search</code></td>
-<td>10 requests per minute per IP</td>
-</tr>
-</tbody>
-</table>
-<p>Exceeding the limit returns <code>429 Too Many Requests</code>.</p>
-<h2 id="reporting-vulnerabilities">Reporting vulnerabilities<a class="headerlink" href="#reporting-vulnerabilities" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/muhmunt/dotkey/blob/main/SECURITY.md">SECURITY.md</a> for the responsible disclosure process.</p>
+<p>The log shows your own events only and retains the last 100 entries.</p>
+<h2 id="api-access">API access<a class="headerlink" href="#api-access" title="Permanent link">&para;</a></h2>
+<p><code>GET /api/v1/auth/audit-log</code></p>
+<p>Returns the last 100 entries as JSON. See <a href="../../api/authentication/#security-audit-log">API Authentication</a> for the full response schema.</p>
 
 
 
@@ -2279,10 +1922,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

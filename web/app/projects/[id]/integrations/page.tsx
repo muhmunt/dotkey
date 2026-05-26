@@ -18,6 +18,28 @@ export default function IntegrationsPage() {
 
   const sections = [
     {
+      title: "dotkey run",
+      description: "Inject secrets directly into a subprocess — no .env file written to disk.",
+      blocks: [
+        {
+          label: "Development server",
+          prompt: true,
+          code: `dotkey run -- npm run dev`,
+        },
+        {
+          label: "Specific environment",
+          prompt: true,
+          code: `dotkey run ${envName} -- node server.js`,
+        },
+        {
+          label: "Any command",
+          prompt: true,
+          code: `dotkey run -p ${projectName} -e ${envName} -- pytest`,
+        },
+      ],
+      note: "Secrets are injected as environment variables and override any existing values with the same name. Nothing is written to disk.",
+    },
+    {
       title: "GitHub Actions",
       description: "Pull secrets into your CI/CD pipeline using a project token stored in GitHub Secrets.",
       blocks: [

@@ -16,7 +16,7 @@
         <link rel="prev" href="../docker/">
       
       
-        <link rel="next" href="../../dashboard/projects/">
+        <link rel="next" href="../env-encryption/">
       
       
         
@@ -742,17 +742,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#encrypting-your-env-recommended-for-production" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Encrypting your .env (recommended for production)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#required" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -796,10 +785,49 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#secret-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secret rotation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../env-encryption/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .env Encryption
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1731,17 +1759,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#encrypting-your-env-recommended-for-production" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Encrypting your .env (recommended for production)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#required" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1785,6 +1802,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#secret-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secret rotation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1807,39 +1835,11 @@
 
 <h1 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h1>
 <p>All variables are set in the <code>.env</code> file at the repo root.</p>
-<h2 id="encrypting-your-env-recommended-for-production">Encrypting your .env (recommended for production)<a class="headerlink" href="#encrypting-your-env-recommended-for-production" title="Permanent link">&para;</a></h2>
-<p>dotkey supports <strong>Pattern A</strong> value-level encryption — sensitive values are encrypted in-place while non-secret values (<code>PORT</code>, <code>ALLOWED_ORIGINS</code>) stay readable.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 1. Build the encryption tool</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go<span class="w"> </span>build<span class="w"> </span>-o<span class="w"> </span>dotkey-enc<span class="w"> </span>./tools/envenc
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># 2. Generate a master key (keep this secret — never put it in .env)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>./dotkey-enc<span class="w"> </span>keygen
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># → DOTKEY_MASTER_KEY=499601be72f5...</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># 3. Export the master key in your shell</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DOTKEY_MASTER_KEY</span><span class="o">=</span>499601be72f5...
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1"># 4. Encrypt the sensitive values in your .env</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>./dotkey-enc<span class="w"> </span>encrypt<span class="w"> </span>.env
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># → JWT_SECRET=encrypted:v1:KaQP...:og_E...</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># → ENCRYPTION_KEY=encrypted:v1:lV7A...:J6rL...</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1"># → DATABASE_URL=encrypted:v1:HciG...:hyrF...</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="c1"># 5. Preview decrypted values at any time (does not modify the file)</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>./dotkey-enc<span class="w"> </span>decrypt<span class="w"> </span>.env
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="c1"># 6. Encrypt specific keys only</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>./dotkey-enc<span class="w"> </span>encrypt<span class="w"> </span>.env<span class="w"> </span>JWT_SECRET<span class="w"> </span>ENCRYPTION_KEY
-</code></pre></div>
-<p>At server startup, set <code>DOTKEY_MASTER_KEY</code> in the environment (Docker secret, systemd credential, shell) — the server automatically decrypts any <code>encrypted:v1:…</code> values before reading the config.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">DOTKEY_MASTER_KEY</span><span class="o">=</span>&lt;key&gt;<span class="w"> </span>./dotkey-api
-</code></pre></div>
-<div class="admonition warning">
-<p class="admonition-title">Never store DOTKEY_MASTER_KEY in .env</p>
-<p>The master key must come from outside the <code>.env</code> file — a Docker secret,
-a <code>systemd</code> <code>EnvironmentFile</code> with restricted permissions, or an operator's
-shell. If the master key and the encrypted <code>.env</code> are in the same place,
-encryption provides no protection.</p>
+<div class="admonition tip">
+<p class="admonition-title">Encrypt your .env in production</p>
+<p>Sensitive values (<code>JWT_SECRET</code>, <code>ENCRYPTION_KEY</code>, <code>DATABASE_URL</code>) can be
+encrypted in-place so a leaked <code>.env</code> file is useless without the master key.
+See <a href="../env-encryption/">.env Encryption</a> for the full guide.</p>
 </div>
 <h2 id="required">Required<a class="headerlink" href="#required" title="Permanent link">&para;</a></h2>
 <table>
@@ -1962,14 +1962,45 @@ encryption provides no protection.</p>
 </tbody>
 </table>
 <p>Pass it as a Docker build arg:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker<span class="w"> </span>build<span class="w"> </span>--build-arg<span class="w"> </span><span class="nv">NEXT_PUBLIC_API_URL</span><span class="o">=</span>https://api.example.com<span class="w"> </span>-t<span class="w"> </span>dotkey-web<span class="w"> </span>./web
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>build<span class="w"> </span>--build-arg<span class="w"> </span><span class="nv">NEXT_PUBLIC_API_URL</span><span class="o">=</span>https://api.example.com<span class="w"> </span>-t<span class="w"> </span>dotkey-web<span class="w"> </span>./web
 </code></pre></div>
 <p>When using Docker Compose, set it under <code>build.args</code> in <code>docker-compose.yml</code> (already configured by default) — updating it in <code>.env</code> and rebuilding is sufficient.</p>
-<div class="admonition warning">
-<p class="admonition-title">Secret rotation</p>
-<p>Changing <code>ENCRYPTION_KEY</code> will make all existing secrets unreadable.
-Changing <code>JWT_SECRET</code> will invalidate all active sessions.
-Changing <code>NEXT_PUBLIC_API_URL</code> requires rebuilding the <code>web</code> image.</p>
+<h2 id="secret-rotation">Secret rotation<a class="headerlink" href="#secret-rotation" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Secret</th>
+<th>Effect of changing</th>
+<th>Migration path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ENCRYPTION_KEY</code></td>
+<td>All stored variable values become <strong>permanently unreadable</strong></td>
+<td>Re-export all variables before changing, re-import after</td>
+</tr>
+<tr>
+<td><code>JWT_SECRET</code></td>
+<td>All active user sessions are <strong>immediately invalidated</strong></td>
+<td>Users must log in again; safe to rotate at any time</td>
+</tr>
+<tr>
+<td><code>NEXT_PUBLIC_API_URL</code></td>
+<td>No effect until the <code>web</code> image is rebuilt</td>
+<td><code>docker-compose build web &amp;&amp; docker-compose up -d web</code></td>
+</tr>
+<tr>
+<td><code>DOTKEY_MASTER_KEY</code></td>
+<td>Encrypted <code>.env</code> cannot be read by the server</td>
+<td>See <a href="../env-encryption/#key-rotation">key rotation</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>There is no migration tool for <code>ENCRYPTION_KEY</code> rotation. Export all environment
+variables to plaintext before changing the key, then re-import after.</p>
 </div>
 
 

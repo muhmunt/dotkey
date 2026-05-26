@@ -698,6 +698,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../self-hosting/env-encryption/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .env Encryption
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1648,6 +1676,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#env-file-encryption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .env file encryption
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#passwords" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1770,6 +1809,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#env-file-encryption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .env file encryption
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#passwords" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1874,6 +1924,10 @@
 <li>The same plaintext encrypted twice produces different ciphertexts</li>
 <li>Without the <code>ENCRYPTION_KEY</code>, the database contains only unreadable ciphertext</li>
 </ul>
+<h2 id="env-file-encryption">.env file encryption<a class="headerlink" href="#env-file-encryption" title="Permanent link">&para;</a></h2>
+<p>The server's own <code>.env</code> file (which contains <code>ENCRYPTION_KEY</code>, <code>JWT_SECRET</code>, <code>DATABASE_URL</code>) can be encrypted at rest using the <code>dotkey-enc</code> tool. Sensitive values are replaced with <code>encrypted:v1:…</code> blobs; the server decrypts them in memory at startup using <code>DOTKEY_MASTER_KEY</code>, which is never stored in the <code>.env</code> file itself.</p>
+<p>See <a href="../self-hosting/env-encryption/">.env Encryption</a> for the full guide.</p>
+<p>The CLI auth token stored in <code>~/.dotkey/config.yaml</code> is also encrypted at rest using a per-machine key (<code>~/.dotkey/key</code>, mode 0600).</p>
 <h2 id="passwords">Passwords<a class="headerlink" href="#passwords" title="Permanent link">&para;</a></h2>
 <p>User passwords are hashed with <strong>bcrypt</strong> (cost factor 10). The plaintext password is never stored or logged.</p>
 <h2 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h2>
